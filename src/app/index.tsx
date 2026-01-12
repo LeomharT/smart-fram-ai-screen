@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { App, ConfigProvider, Image, Space, theme } from 'antd';
 import Nprogress from 'nprogress';
 import { Suspense, useEffect } from 'react';
@@ -25,15 +26,18 @@ export default function AppShell() {
         }}
       >
         <QueryClientProvider client={queryClient}>
+          <ReactQueryDevtools />
           <div className={classes.wrap}>
             <div className={classes.content}>
               <header className={classes.header}>
                 <Space size='large'>
-                  <Image
-                    preview={false}
-                    width={60}
-                    src='/assets/imgs/logo.png'
-                  />
+                  {match[match.length - 1]?.pathname === '/' && (
+                    <Image
+                      preview={false}
+                      width={60}
+                      src='/assets/imgs/logo.png'
+                    />
+                  )}
                   <h1>{(match.at(-1)?.handle as { title?: string })?.title}</h1>
                 </Space>
               </header>

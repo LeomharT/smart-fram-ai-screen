@@ -7,7 +7,7 @@
 
 .footer {
   width: 100%;
-  min-width: calc(360px * 4 + 120px);
+  min-width: calc(360px * 4 + 240px);
   position: absolute;
   bottom: 0;
   padding-inline: 60px;
@@ -20,7 +20,7 @@
 
 .list {
   width: 100%;
-  padding-inline: 60px;
+  padding-inline: 120px;
   height: fit-content;
   display: flex;
   flex-flow: row nowrap;

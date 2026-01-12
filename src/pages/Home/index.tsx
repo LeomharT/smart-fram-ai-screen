@@ -1,10 +1,14 @@
 import { Button } from 'antd';
+import { useNavigate } from 'react-router';
 import classes from './style.module.css';
 import navi_1 from '/assets/imgs/navi_1.png?url';
 import navi_2 from '/assets/imgs/navi_2.png?url';
 import navi_3 from '/assets/imgs/navi_3.png?url';
 import navi_4 from '/assets/imgs/navi_4.png?url';
+
 export default function Home() {
+  const navigate = useNavigate();
+
   const items = [
     {
       url: '/analysis',
@@ -38,7 +42,9 @@ export default function Home() {
             className={classes.item}
             style={{ backgroundImage: `url(${value.src})` }}
           >
-            <Button ghost>{value.label}</Button>
+            <Button ghost onClick={() => navigate(value.url)}>
+              {value.label}
+            </Button>
           </div>
         ))}
       </div>

@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { App, ConfigProvider, Image, Space, theme } from 'antd';
+import zh_CN from 'antd/locale/zh_CN';
 import Nprogress from 'nprogress';
 import { Suspense, useEffect } from 'react';
 import { Outlet, useMatches } from 'react-router';
@@ -10,7 +11,13 @@ Nprogress.configure({
   showSpinner: false,
 });
 
-const queryClient = new QueryClient({});
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 export default function AppShell() {
   const match = useMatches();
@@ -18,6 +25,7 @@ export default function AppShell() {
   return (
     <App>
       <ConfigProvider
+        locale={zh_CN}
         theme={{
           algorithm: theme.defaultAlgorithm,
           token: {

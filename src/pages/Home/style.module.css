@@ -29,6 +29,7 @@
   row-gap: 48px;
   position: absolute;
   bottom: 329px;
+  gap: 16px;
 }
 
 .item {

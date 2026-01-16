@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { App, ConfigProvider, Image, Space, theme } from 'antd';
+import { Alert, App, ConfigProvider, Image, Space, theme } from 'antd';
 import zh_CN from 'antd/locale/zh_CN';
 import Nprogress from 'nprogress';
 import { Suspense, useEffect } from 'react';
@@ -51,7 +51,9 @@ export default function AppShell() {
               </header>
               <main className={classes.main}>
                 <Suspense fallback={<Fallback />}>
-                  <Outlet />
+                  <Alert.ErrorBoundary>
+                    <Outlet />
+                  </Alert.ErrorBoundary>
                 </Suspense>
               </main>
             </div>

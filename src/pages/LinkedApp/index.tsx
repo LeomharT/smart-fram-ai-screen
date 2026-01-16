@@ -1,28 +1,111 @@
 import { getLinkedAppList } from '@/api/linked-app';
 import TransparentCard from '@/components/TransparentCard';
 import { QIERIES } from '@/constant/queries';
+import type {
+  ExecutionAction,
+  TirggerCondition,
+} from '@/types/linked-app.type';
 import { PlusOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
-import { Button, Flex, Table, type TableProps } from 'antd';
+import { Badge, Button, Card, Flex, Space, Table, type TableProps } from 'antd';
 import { useState } from 'react';
 import LinkedAppForm from './components/LinkedAppForm';
 import classes from './style.module.css';
 
+const dateFormater = new Intl.DateTimeFormat('zh-CN', {
+  dateStyle: 'medium',
+  timeStyle: 'medium',
+});
+
 export default function LinkedApp() {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   const query = useQuery({
     queryKey: [QIERIES.LINKED_APP.LIST],
     queryFn: getLinkedAppList,
+    initialData: [],
   });
 
   const columns: TableProps['columns'] = [
-    { key: '1', title: '联动名称', dataIndex: '' },
-    { key: '2', title: '触发条件', dataIndex: '2' },
-    { key: '3', title: '执行动作', dataIndex: '2' },
-    { key: '4', title: '创建时间', dataIndex: '2' },
-    { key: '5', title: '状态', dataIndex: '2' },
-    { key: 'actions', title: '操作', dataIndex: '' },
+    { key: 'linkageName1', title: '联动名称', dataIndex: 'linkageName' },
+    {
+      key: 'triggerCondition',
+      title: '触发条件',
+      dataIndex: 'triggerCondition',
+      render(value) {
+        const json: TirggerCondition[] = JSON.parse(value);
+        return (
+          <span>
+            {json
+              .map((item) => item.property + item.operator + item.value)
+              .join(', ')}
+          </span>
+        );
+      },
+    },
+    {
+      key: 'executionAction',
+      title: '执行动作',
+      dataIndex: 'executionAction',
+      render(value) {
+        const json: ExecutionAction[] = JSON.parse(value);
+        return (
+          <span>
+            {json
+              .map(
+                (item) => item.property + ': ' + (item.value ? '开启' : '关闭')
+              )
+              .join(', ')}
+          </span>
+        );
+      },
+    },
+    {
+      key: 'createdAt',
+      title: '创建时间',
+      dataIndex: 'createdAt',
+      render(value) {
+        return dateFormater.format(new Date(value));
+      },
+    },
+    {
+      key: 'isEnabled',
+      title: '状态',
+      dataIndex: 'isEnabled',
+      render: (value) =>
+        value ? (
+          <Badge status='success' text='开启' />
+        ) : (
+          <Badge status='error' text='停止' />
+        ),
+    },
+    {
+      key: 'actions',
+      title: '操作',
+      dataIndex: '',
+      render() {
+        return (
+          <Space>
+            <Button
+              className={classes.action}
+              size='small'
+              type='link'
+              onClick={() => {
+                setOpen(true);
+              }}
+            >
+              配置
+            </Button>
+            <Button className={classes.action} size='small' type='link'>
+              停用
+            </Button>
+            <Button className={classes.action} danger size='small' type='link'>
+              删除
+            </Button>
+          </Space>
+        );
+      },
+    },
   ];
 
   return (
@@ -39,7 +122,19 @@ export default function LinkedApp() {
           </Button>
         </Flex>
         <br />
-        <Table columns={columns} />
+        <Card>
+          <Card.Meta title='联动应用' />
+          <br />
+          <Table
+            rowKey='id'
+            size='middle'
+            columns={columns}
+            dataSource={query.data}
+            pagination={{
+              size: 'default',
+            }}
+          />
+        </Card>
       </TransparentCard>
     </div>
   );

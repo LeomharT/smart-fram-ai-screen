@@ -18,7 +18,6 @@ import {
   Switch,
   type ModalProps,
 } from 'antd';
-import { useEffect } from 'react';
 import classes from './style.module.css';
 
 type LinkedAppFormProps = ModalProps & {};
@@ -46,6 +45,11 @@ export default function LinkedAppForm(props: LinkedAppFormProps) {
   function handleOnFinish(value: LinkedAppFormValue) {
     console.log(value);
     post.mutate(value);
+  }
+
+  function handleOnCancel(e: React.MouseEvent<HTMLButtonElement>) {
+    form.resetFields();
+    props.onCancel?.(e);
   }
 
   function onDeviceChange(index: number) {
@@ -81,15 +85,12 @@ export default function LinkedAppForm(props: LinkedAppFormProps) {
     return props?.map((item) => ({ label: item, value: item })) ?? [];
   }
 
-  useEffect(() => {
-    if (!props.open) form.resetFields();
-  }, [props.open, form]);
-
   return (
     <Modal
       {...props}
       title='联动应用'
       width='45%'
+      onCancel={handleOnCancel}
       onOk={() => form.submit()}
       loading={query.isFetching}
       confirmLoading={post.isPending}
@@ -117,22 +118,17 @@ export default function LinkedAppForm(props: LinkedAppFormProps) {
         <Form.Item label='触发器'>
           <Form.List
             name='triggerCondition'
-            initialValue={[
+            rules={[
               {
-                device_type: 'Multi_in_One_Sensor',
-                property: 'temperature',
-                operator: '>=',
-                value: 35,
-              },
-              {
-                device_type: 'Multi_in_One_Sensor',
-                property: 'humidity',
-                operator: '<',
-                value: 40,
+                validator: async (_, names) => {
+                  if (!names) {
+                    return Promise.reject(new Error('请添加至少一条触发规则'));
+                  }
+                },
               },
             ]}
           >
-            {(field, { add, remove }) => (
+            {(field, { add, remove }, { errors }) => (
               <>
                 <div className={classes.section} hidden={!field.length}>
                   {field.map(({ key, name }) => (
@@ -226,6 +222,7 @@ export default function LinkedAppForm(props: LinkedAppFormProps) {
                 >
                   添加触发器
                 </Button>
+                <Form.ErrorList errors={errors} />
               </>
             )}
           </Form.List>
@@ -234,18 +231,6 @@ export default function LinkedAppForm(props: LinkedAppFormProps) {
         <Form.Item label='执行动作'>
           <Form.List
             name='executionAction'
-            initialValue={[
-              {
-                executor_type: 'lhio404',
-                property: 'DO1',
-                value: 1,
-              },
-              {
-                executor_type: 'lhio404',
-                property: 'DO2',
-                value: 0,
-              },
-            ]}
             rules={[
               {
                 validator: async (_, names) => {

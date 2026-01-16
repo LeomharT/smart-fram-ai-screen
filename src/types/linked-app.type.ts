@@ -15,19 +15,32 @@ export interface LinkedAppOptions {
   }[];
 }
 
+export interface TirggerCondition {
+  device_type: string;
+  property: string;
+  operator: string;
+  value: number;
+}
+
+export interface ExecutionAction {
+  executor_type: string;
+  property: string;
+  value: number;
+}
+
 export interface LinkedAppFormValue {
   id?: string;
   linkageName: string;
   isEnabled: number;
-  triggerCondition: {
-    device_type: string;
-    property: string;
-    operator: string;
-    value: 35;
-  }[];
-  executionAction: {
-    executor_type: string;
-    property: string;
-    value: 1;
-  }[];
+  triggerCondition: TirggerCondition[];
+  executionAction: ExecutionAction[];
+}
+
+export interface LinkedApps {
+  id: number;
+  executionAction: ExecutionAction[];
+  isEnabled: number;
+  linkageName: number;
+  triggerCondition: TirggerCondition[];
+  createdAt: string;
 }

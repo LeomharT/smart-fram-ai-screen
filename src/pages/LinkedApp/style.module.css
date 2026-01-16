@@ -2,3 +2,9 @@
   padding: 16px;
   height: 100%;
 }
+
+.action {
+  & span:not(:hover) {
+    color: black !important;
+  }
+}

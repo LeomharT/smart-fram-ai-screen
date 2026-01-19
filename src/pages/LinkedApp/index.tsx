@@ -169,12 +169,19 @@ export default function LinkedApp() {
     setInitialValue(null);
   }
 
+  function handleOnSuccess() {
+    handleOnClose();
+    message.success('应用数据提交成功');
+    query.refetch();
+  }
+
   return (
     <div className={classes.apps}>
       <LinkedAppForm
         open={open}
         initialValue={initialValue}
         onCancel={handleOnClose}
+        onSuccess={handleOnSuccess}
       />
       <TransparentCard style={{ height: '100%' }}>
         <Flex wrap='nowrap' gap={16}>

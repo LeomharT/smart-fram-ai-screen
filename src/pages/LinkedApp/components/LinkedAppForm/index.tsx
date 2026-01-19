@@ -23,6 +23,7 @@ import classes from './style.module.css';
 
 type LinkedAppFormProps = ModalProps & {
   initialValue: Partial<LinkedAppFormValue> | null;
+  onSuccess?: () => void;
 };
 
 export default function LinkedAppForm(props: LinkedAppFormProps) {
@@ -43,11 +44,12 @@ export default function LinkedAppForm(props: LinkedAppFormProps) {
   const post = useMutation({
     mutationKey: [MUTATIONS.LINKED_APP.POST],
     mutationFn: postLinkedApp,
+    onSuccess: props.onSuccess,
   });
 
   function handleOnFinish(value: LinkedAppFormValue) {
     console.log(value);
-    // post.mutate(value);
+    post.mutate(value);
   }
 
   function onDeviceChange(index: number) {
@@ -221,8 +223,8 @@ export default function LinkedAppForm(props: LinkedAppFormProps) {
                   icon={<PlusOutlined />}
                   onClick={() =>
                     add({
-                      device_type: '',
-                      property: '',
+                      device_type: undefined,
+                      property: undefined,
                       operator: '==',
                       value: undefined,
                     })
@@ -260,7 +262,10 @@ export default function LinkedAppForm(props: LinkedAppFormProps) {
                           name={[name, 'executor_type']}
                           rules={[{ required: true }]}
                         >
-                          <Select options={query.data?.actuator} />
+                          <Select
+                            placeholder='请选择需要执行的设备'
+                            options={query.data?.actuator}
+                          />
                         </Form.Item>
                         <div className={classes.execution}>
                           <Form.Item
@@ -321,9 +326,9 @@ export default function LinkedAppForm(props: LinkedAppFormProps) {
                   icon={<PlusOutlined />}
                   onClick={() => {
                     add({
-                      executor_type: 'Smart_Fan',
-                      property: 'power_state',
-                      value: 1,
+                      executor_type: undefined,
+                      property: undefined,
+                      value: undefined,
                     });
                   }}
                 >

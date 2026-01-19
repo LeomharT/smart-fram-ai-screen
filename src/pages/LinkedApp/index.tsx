@@ -52,6 +52,16 @@ export default function LinkedApp() {
     mutationKey: [MUTATIONS.LINKED_APP.DELETE],
     mutationFn: deleteLinkedApp,
     onSuccess() {
+      let page = Number(search.get('pageNum') ?? 1);
+      if (query.data.data?.length === 1) {
+        if (page !== 1) {
+          page -= 1;
+          setSearch((prev) => {
+            prev.set('pageNum', page.toString());
+            return prev;
+          });
+        }
+      }
       message.success('应用删除成功');
       query.refetch();
     },
@@ -220,7 +230,7 @@ export default function LinkedApp() {
             dataSource={query.data.data}
             pagination={{
               size: 'default',
-              pageSize: 1,
+              pageSize: 10,
               total: query.data.total,
               current: Number(search.get('pageNum') ?? 1),
               onChange: handleOnPageChange,

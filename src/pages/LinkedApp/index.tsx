@@ -1,4 +1,8 @@
-import { deleteLinkedApp, getLinkedAppList } from '@/api/linked-app';
+import {
+  deleteLinkedApp,
+  getLinkedAppList,
+  putLinkedApp,
+} from '@/api/linked-app';
 import TransparentCard from '@/components/TransparentCard';
 import { MUTATIONS } from '@/constant/mutations';
 import { QIERIES } from '@/constant/queries';
@@ -67,8 +71,17 @@ export default function LinkedApp() {
     },
   });
 
+  const put = useMutation({
+    mutationKey: [MUTATIONS.LINKED_APP.PUT],
+    mutationFn: putLinkedApp,
+    onSuccess() {
+      message.success('操作成功');
+      query.refetch();
+    },
+  });
+
   const columns: TableProps['columns'] = [
-    { key: 'linkageName1', title: '联动名称', dataIndex: 'linkageName' },
+    { key: 'linkageName', title: '联动名称', dataIndex: 'linkageName' },
     {
       key: 'triggerCondition',
       title: '触发条件',
@@ -149,8 +162,30 @@ export default function LinkedApp() {
               size='small'
               variant='link'
               color='primary'
+              onClick={() => {
+                const isEnabled = record.isEnabled ? 0 : 1;
+                const text = record.isEnabled ? '停用' : '启用';
+                const data = {
+                  ...record,
+                  executionAction: JSON.parse(record.executionAction),
+                  triggerCondition: JSON.parse(record.triggerCondition),
+                  isEnabled,
+                } as LinkedAppFormValue;
+                modal.confirm({
+                  title: text + '该应用吗? ',
+                  okText: text + '应用',
+                  content: `您确定${text}该应用吗? `,
+                  cancelText: '取消',
+                  okButtonProps: {
+                    danger: record.isEnabled ? true : false,
+                  },
+                  onOk() {
+                    return put.mutateAsync(data);
+                  },
+                });
+              }}
             >
-              停用
+              {record.isEnabled ? '停用' : '启用'}
             </Button>
             <Button
               className={classes.action}

@@ -23,16 +23,16 @@ export default function AppShell() {
   const match = useMatches();
 
   return (
-    <App>
-      <ConfigProvider
-        locale={zh_CN}
-        theme={{
-          algorithm: theme.defaultAlgorithm,
-          token: {
-            colorPrimary: '#00b96b',
-          },
-        }}
-      >
+    <ConfigProvider
+      locale={zh_CN}
+      theme={{
+        algorithm: theme.defaultAlgorithm,
+        token: {
+          colorPrimary: '#00b96b',
+        },
+      }}
+    >
+      <App>
         <QueryClientProvider client={queryClient}>
           <ReactQueryDevtools />
           <div className={classes.wrap}>
@@ -59,8 +59,8 @@ export default function AppShell() {
             </div>
           </div>
         </QueryClientProvider>
-      </ConfigProvider>
-    </App>
+      </App>
+    </ConfigProvider>
   );
 }
 

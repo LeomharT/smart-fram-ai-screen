@@ -17,17 +17,15 @@ export type DefaultMeta = {
 
 export default async function fetchData<T = unknown, M = DefaultMeta>(
   input: RequestInfo | URL,
-  init?: RequestInit
+  init?: RequestInit,
 ) {
   let token = localStorage.getItem('token');
 
   if (token) token = JSON.parse(token);
 
   const defaultHeader: {
-    Authorization?: string;
     'CONTENT-TYPE'?: string;
   } = {
-    Authorization: `${token}`,
     'CONTENT-TYPE': 'application/json',
   };
 

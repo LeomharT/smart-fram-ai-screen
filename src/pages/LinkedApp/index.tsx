@@ -200,6 +200,7 @@ export default function LinkedApp() {
           <Table
             rowKey='id'
             size='small'
+            loading={query.isFetching}
             columns={columns}
             dataSource={query.data}
             pagination={{

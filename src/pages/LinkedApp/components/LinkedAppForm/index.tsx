@@ -1,4 +1,8 @@
-import { getLinkedAppOptions, postLinkedApp } from '@/api/linked-app';
+import {
+  getLinkedAppOptions,
+  postLinkedApp,
+  putLinkedApp,
+} from '@/api/linked-app';
 import { MUTATIONS } from '@/constant/mutations';
 import { QIERIES } from '@/constant/queries';
 import type { LinkedAppFormValue } from '@/types/linked-app.type';
@@ -47,9 +51,19 @@ export default function LinkedAppForm(props: LinkedAppFormProps) {
     onSuccess: props.onSuccess,
   });
 
+  const put = useMutation({
+    mutationKey: [MUTATIONS.LINKED_APP.PUT],
+    mutationFn: putLinkedApp,
+    onSuccess: props.onSuccess,
+  });
+
   function handleOnFinish(value: LinkedAppFormValue) {
-    console.log(value);
-    post.mutate(value);
+    if (props.initialValue?.id) {
+      put.mutate({ id: props.initialValue.id, ...value });
+    } else {
+      post.mutate(value);
+    }
+    return;
   }
 
   function onDeviceChange(index: number) {

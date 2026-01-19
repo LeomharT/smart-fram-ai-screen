@@ -1,5 +1,6 @@
-import { getLinkedAppList } from '@/api/linked-app';
+import { deleteLinkedApp, getLinkedAppList } from '@/api/linked-app';
 import TransparentCard from '@/components/TransparentCard';
+import { MUTATIONS } from '@/constant/mutations';
 import { QIERIES } from '@/constant/queries';
 import type {
   ExecutionAction,
@@ -7,8 +8,17 @@ import type {
   TirggerCondition,
 } from '@/types/linked-app.type';
 import { PlusOutlined } from '@ant-design/icons';
-import { useQuery } from '@tanstack/react-query';
-import { Badge, Button, Card, Flex, Space, Table, type TableProps } from 'antd';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import {
+  App,
+  Badge,
+  Button,
+  Card,
+  Flex,
+  Space,
+  Table,
+  type TableProps,
+} from 'antd';
 import { useState } from 'react';
 import LinkedAppForm from './components/LinkedAppForm';
 import classes from './style.module.css';
@@ -19,6 +29,8 @@ const dateFormater = new Intl.DateTimeFormat('zh-CN', {
 });
 
 export default function LinkedApp() {
+  const { modal, message } = App.useApp();
+
   const [open, setOpen] = useState(false);
 
   const [initialValue, setInitialValue] =
@@ -28,6 +40,15 @@ export default function LinkedApp() {
     queryKey: [QIERIES.LINKED_APP.LIST],
     queryFn: getLinkedAppList,
     initialData: [],
+  });
+
+  const mutation = useMutation({
+    mutationKey: [MUTATIONS.LINKED_APP.DELETE],
+    mutationFn: deleteLinkedApp,
+    onSuccess() {
+      message.success('应用删除成功');
+      query.refetch();
+    },
   });
 
   const columns: TableProps['columns'] = [
@@ -115,7 +136,26 @@ export default function LinkedApp() {
             >
               停用
             </Button>
-            <Button className={classes.action} danger size='small' type='link'>
+            <Button
+              className={classes.action}
+              danger
+              size='small'
+              type='link'
+              onClick={() => {
+                modal.confirm({
+                  title: '删除联动应用',
+                  content: `您确定要删除应用${record.linkageName}吗?`,
+                  okText: '删除应用',
+                  cancelText: '取消',
+                  okButtonProps: {
+                    danger: true,
+                  },
+                  onOk() {
+                    return mutation.mutateAsync(record.id);
+                  },
+                });
+              }}
+            >
               删除
             </Button>
           </Space>
@@ -152,7 +192,7 @@ export default function LinkedApp() {
           <br />
           <Table
             rowKey='id'
-            size='middle'
+            size='small'
             columns={columns}
             dataSource={query.data}
             pagination={{

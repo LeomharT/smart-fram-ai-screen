@@ -15,12 +15,18 @@ export async function getLinkedAppOptions() {
 }
 
 export async function postLinkedApp(value: LinkedAppFormValue) {
-  return fetchData(APIS.LINKED_APP.POST, {
+  return fetchData(APIS.LINKED_APP.ENDPOINT, {
     method: 'POST',
     body: JSON.stringify({
       ...value,
       triggerCondition: JSON.stringify(value.triggerCondition),
       executionAction: JSON.stringify(value.executionAction),
     }),
+  });
+}
+
+export async function deleteLinkedApp(id: string) {
+  return fetchData(APIS.LINKED_APP.ENDPOINT + `/${id}`, {
+    method: 'DELETE',
   });
 }

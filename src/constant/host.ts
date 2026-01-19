@@ -17,6 +17,6 @@ export const APIS = {
   LINKED_APP: {
     LIST: `${HOST}/${PREFIX}/screen/scene_linkage_config/list`,
     OPTIONS: `${HOST}/${PREFIX}/screen/scene_linkage_config/options`,
-    POST: `${HOST}/${PREFIX}/screen/scene_linkage_config`,
+    ENDPOINT: `${HOST}/${PREFIX}/screen/scene_linkage_config`,
   },
 };

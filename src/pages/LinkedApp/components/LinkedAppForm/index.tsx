@@ -135,7 +135,7 @@ export default function LinkedAppForm(props: LinkedAppFormProps) {
         <Form.Item name='isEnabled' label='场景状态' initialValue={true}>
           <Switch />
         </Form.Item>
-        <Form.Item name='note' label='备注信息'>
+        <Form.Item name='remark' label='备注信息'>
           <Input.TextArea placeholder='请输入备注信息' rows={3} />
         </Form.Item>
         <Divider />

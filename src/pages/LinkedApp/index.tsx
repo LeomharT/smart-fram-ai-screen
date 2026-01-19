@@ -20,6 +20,7 @@ import {
   type TableProps,
 } from 'antd';
 import { useState } from 'react';
+import { useSearchParams } from 'react-router';
 import LinkedAppForm from './components/LinkedAppForm';
 import classes from './style.module.css';
 
@@ -36,10 +37,15 @@ export default function LinkedApp() {
   const [initialValue, setInitialValue] =
     useState<Partial<LinkedAppFormValue> | null>(null);
 
+  const [search, setSearch] = useSearchParams();
+
   const query = useQuery({
     queryKey: [QIERIES.LINKED_APP.LIST],
-    queryFn: getLinkedAppList,
-    initialData: [],
+    queryFn: () => getLinkedAppList(location.search),
+    initialData: {
+      data: [],
+      total: 0,
+    },
   });
 
   const mutation = useMutation({
@@ -175,6 +181,15 @@ export default function LinkedApp() {
     query.refetch();
   }
 
+  function handleOnPageChange(page: number, pageSize: number) {
+    setSearch((prev) => {
+      prev.set('pageNum', page.toString());
+      prev.set('pageSize', pageSize.toString());
+      return prev;
+    });
+    query.refetch();
+  }
+
   return (
     <div className={classes.apps}>
       <LinkedAppForm
@@ -202,9 +217,13 @@ export default function LinkedApp() {
             size='small'
             loading={query.isFetching}
             columns={columns}
-            dataSource={query.data}
+            dataSource={query.data.data}
             pagination={{
               size: 'default',
+              pageSize: 1,
+              total: query.data.total,
+              current: Number(search.get('pageNum') ?? 1),
+              onChange: handleOnPageChange,
             }}
           />
         </Card>

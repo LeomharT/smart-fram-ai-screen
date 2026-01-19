@@ -34,7 +34,7 @@ export interface LinkedAppFormValue {
   isEnabled: number;
   triggerCondition: TirggerCondition[];
   executionAction: ExecutionAction[];
-  note: string;
+  remark: string;
 }
 
 export interface LinkedApps {

@@ -7,6 +7,7 @@ type BackendResponse<T, M> = {
   msg: string;
   meta: M;
   message?: string;
+  total?: number;
 };
 
 export type DefaultMeta = {
@@ -62,7 +63,7 @@ export default async function fetchData<T = unknown, M = DefaultMeta>(
         break;
     }
 
-    return json.rows ?? json.data;
+    return json;
   } catch (e) {
     Modal.destroyAll();
     if (e instanceof Error) {

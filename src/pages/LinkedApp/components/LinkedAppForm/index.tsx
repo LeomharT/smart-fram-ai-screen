@@ -18,9 +18,12 @@ import {
   Switch,
   type ModalProps,
 } from 'antd';
+import { useEffect } from 'react';
 import classes from './style.module.css';
 
-type LinkedAppFormProps = ModalProps & {};
+type LinkedAppFormProps = ModalProps & {
+  initialValue: Partial<LinkedAppFormValue> | null;
+};
 
 export default function LinkedAppForm(props: LinkedAppFormProps) {
   const { message } = App.useApp();
@@ -44,16 +47,12 @@ export default function LinkedAppForm(props: LinkedAppFormProps) {
 
   function handleOnFinish(value: LinkedAppFormValue) {
     console.log(value);
-    post.mutate(value);
-  }
-
-  function handleOnCancel(e: React.MouseEvent<HTMLButtonElement>) {
-    form.resetFields();
-    props.onCancel?.(e);
+    // post.mutate(value);
   }
 
   function onDeviceChange(index: number) {
     form.setFieldValue(['triggerCondition', index, 'property'], undefined);
+    form.setFieldValue(['triggerCondition', index, 'operator'], undefined);
     form.setFieldValue(['triggerCondition', index, 'value'], undefined);
   }
 
@@ -65,7 +64,7 @@ export default function LinkedAppForm(props: LinkedAppFormProps) {
     ]);
 
     const props = query.data?.sensor_type.find(
-      (value) => value.value === device
+      (value) => value.value === device,
     )?.prop;
 
     return props?.map((item) => ({ label: item, value: item })) ?? [];
@@ -79,19 +78,28 @@ export default function LinkedAppForm(props: LinkedAppFormProps) {
     ]);
 
     const props = query.data?.actuator.find(
-      (value) => value.value === executor
+      (value) => value.value === executor,
     )?.prop;
 
     return props?.map((item) => ({ label: item, value: item })) ?? [];
   }
+
+  useEffect(() => {
+    if (props.open && props.initialValue) {
+      for (const key in props.initialValue) {
+        const _key = key as keyof LinkedAppFormValue;
+        form.setFieldValue(_key, props.initialValue[_key]);
+      }
+    }
+  }, [props.initialValue, props.open, form]);
 
   return (
     <Modal
       {...props}
       title='联动应用'
       width='45%'
-      onCancel={handleOnCancel}
-      onOk={() => form.submit()}
+      onOk={form.submit}
+      afterClose={form.resetFields}
       loading={query.isFetching}
       confirmLoading={post.isPending}
     >
@@ -106,12 +114,12 @@ export default function LinkedAppForm(props: LinkedAppFormProps) {
           label='场景名称'
           rules={[{ required: true }]}
         >
-          <Input placeholder='请输入场景名称' />
+          <Input autoComplete='off' placeholder='请输入场景名称' />
         </Form.Item>
         <Form.Item name='isEnabled' label='场景状态' initialValue={true}>
-          <Switch defaultChecked />
+          <Switch />
         </Form.Item>
-        <Form.Item label='备注信息'>
+        <Form.Item name='note' label='备注信息'>
           <Input.TextArea placeholder='请输入备注信息' rows={3} />
         </Form.Item>
         <Divider />

@@ -3,6 +3,7 @@ import TransparentCard from '@/components/TransparentCard';
 import { QIERIES } from '@/constant/queries';
 import type {
   ExecutionAction,
+  LinkedAppFormValue,
   TirggerCondition,
 } from '@/types/linked-app.type';
 import { PlusOutlined } from '@ant-design/icons';
@@ -19,6 +20,9 @@ const dateFormater = new Intl.DateTimeFormat('zh-CN', {
 
 export default function LinkedApp() {
   const [open, setOpen] = useState(false);
+
+  const [initialValue, setInitialValue] =
+    useState<Partial<LinkedAppFormValue> | null>(null);
 
   const query = useQuery({
     queryKey: [QIERIES.LINKED_APP.LIST],
@@ -53,7 +57,7 @@ export default function LinkedApp() {
           <span>
             {json
               .map(
-                (item) => item.property + ': ' + (item.value ? '开启' : '关闭')
+                (item) => item.property + ': ' + (item.value ? '开启' : '关闭'),
               )
               .join(', ')}
           </span>
@@ -83,20 +87,32 @@ export default function LinkedApp() {
       key: 'actions',
       title: '操作',
       dataIndex: '',
-      render() {
+      render(_, record) {
         return (
           <Space>
             <Button
               className={classes.action}
               size='small'
-              type='link'
+              variant='link'
+              color='primary'
               onClick={() => {
+                const selected = {
+                  ...record,
+                  executionAction: JSON.parse(record.executionAction),
+                  triggerCondition: JSON.parse(record.triggerCondition),
+                };
+                setInitialValue(selected);
                 setOpen(true);
               }}
             >
               配置
             </Button>
-            <Button className={classes.action} size='small' type='link'>
+            <Button
+              className={classes.action}
+              size='small'
+              variant='link'
+              color='primary'
+            >
               停用
             </Button>
             <Button className={classes.action} danger size='small' type='link'>
@@ -108,9 +124,18 @@ export default function LinkedApp() {
     },
   ];
 
+  function handleOnClose() {
+    setOpen(false);
+    setInitialValue(null);
+  }
+
   return (
     <div className={classes.apps}>
-      <LinkedAppForm open={open} onCancel={() => setOpen(false)} />
+      <LinkedAppForm
+        open={open}
+        initialValue={initialValue}
+        onCancel={handleOnClose}
+      />
       <TransparentCard style={{ height: '100%' }}>
         <Flex wrap='nowrap' gap={16}>
           <Button

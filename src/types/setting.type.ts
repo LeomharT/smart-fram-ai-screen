@@ -31,3 +31,8 @@ export interface OpenPlatformConfig {
   APP_SECRET: string;
   BASE_URL: string;
 }
+
+export interface WebCamConfig {
+  configKey: string;
+  configValue: string;
+}

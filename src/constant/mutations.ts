@@ -15,6 +15,9 @@ export const MUTATIONS = {
       OPEN_PLATFORM: {
         PUT: 'OPEN_PLATFORM_PUT',
       },
+      WEBCAM: {
+        PUT: 'WEBCAM_PUT',
+      },
     },
   },
 };

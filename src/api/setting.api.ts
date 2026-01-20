@@ -4,6 +4,7 @@ import type {
   LocalNetworkConfig,
   OpenPlatformConfig,
   SystemInformation,
+  WebCamConfig,
 } from '@/types/setting.type';
 import fetchData from '@/utils/fetchData';
 
@@ -27,6 +28,11 @@ export async function getOpenPlatform() {
   return res?.data;
 }
 
+export async function getWebCamConfig() {
+  const res = await fetchData<WebCamConfig>(APIS.SETTING.WEBCAM);
+  return res?.data;
+}
+
 export async function postLocalNetwork(data: LocalNetworkConfig) {
   return fetchData(APIS.SETTING.LOCAL_NETWORK, {
     method: 'POST',
@@ -45,5 +51,16 @@ export async function putOpenPlatformConfig(data: OpenPlatformConfig) {
   return fetchData(APIS.SETTING.OPEN_PLATFORM, {
     method: 'PUT',
     body: JSON.stringify(data),
+  });
+}
+
+export async function putWebcamConfig(data: WebCamConfig) {
+  const input = {
+    config_value: data.configValue,
+    config_key: data.configKey,
+  };
+  const search = new URLSearchParams(input);
+  return fetchData(APIS.SETTING.WEBCAM + `?${search.toString()}`, {
+    method: 'PUT',
   });
 }

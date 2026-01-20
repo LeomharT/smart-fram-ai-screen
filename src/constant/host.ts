@@ -24,5 +24,6 @@ export const APIS = {
     SYSTEM_INFO: `${HOST}/${PREFIX}/sys/systeminfo`,
     CONNECTOR: `${HOST}/${PREFIX}/aiot/northbound_connector/thingscloud`,
     OPEN_PLATFORM: `${HOST}/${PREFIX}/aiot/northbound_connector/nifc/openapi`,
+    WEBCAM: `${HOST}/${PREFIX}/aiot/camera/system/config/rknn_ai.camera_rtsp`,
   },
 };

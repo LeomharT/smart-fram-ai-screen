@@ -4,6 +4,7 @@ export const QUERIES = {
     OPTIONS: 'LINKED_APP_OPTIONS',
   },
   SETTING: {
+    LOCAL_NETWORK: 'LOCAL_NETWORK',
     SYSTEM_INFO: 'SYSTEM_INFO',
   },
 };

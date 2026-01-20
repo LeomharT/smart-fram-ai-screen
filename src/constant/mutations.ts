@@ -4,4 +4,9 @@ export const MUTATIONS = {
     PUT: 'LINKED_APP_PUT',
     DELETE: 'LINKED_APP_DELETE',
   },
+  SETTING: {
+    LOCAL_NETWORK: {
+      POST: 'LOCAL_NETWORK_POST',
+    },
+  },
 };

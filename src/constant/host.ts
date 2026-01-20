@@ -20,6 +20,7 @@ export const APIS = {
     ENDPOINT: `${HOST}/${PREFIX}/screen/scene_linkage_config`,
   },
   SETTING: {
+    LOCAL_NETWORK: `${HOST}/${PREFIX}/sys/network-config`,
     SYSTEM_INFO: `${HOST}/${PREFIX}/sys/systeminfo`,
   },
 };

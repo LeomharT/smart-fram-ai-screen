@@ -1,21 +1,20 @@
 import TransparentCard from '@/components/TransparentCard';
 import { Button, Card, Flex } from 'antd';
 import { useState } from 'react';
-import LocalSetting from './LocalSetting';
+import LocalNetwork from './LocalNetwork';
 import classes from './style.module.css';
 import SystemInfo from './SystemInfo';
 import cardbg from '/assets/imgs/cardbg.png?url';
-console.log(cardbg);
 
 const items = [
-  { key: 'localSetting', label: '本地设置' },
+  { key: 'localNetwork', label: '本地设置' },
   { key: 'network', label: '网络服务配置' },
   { key: 'LLMConfig', label: '农业大模型助手配置' },
   { key: 'systemInfo', label: '系统信息' },
 ];
 
 export default function Setting() {
-  const [active, setActive] = useState('systemInfo');
+  const [active, setActive] = useState('localNetwork');
 
   return (
     <div className={classes.setting}>
@@ -48,7 +47,7 @@ export default function Setting() {
             backgroundImage: `url(${cardbg})`,
           }}
         >
-          {active === 'localSetting' && <LocalSetting />}
+          {active === 'localNetwork' && <LocalNetwork />}
           {active === 'systemInfo' && <SystemInfo />}
         </Card>
       </TransparentCard>

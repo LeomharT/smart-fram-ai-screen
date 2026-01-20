@@ -1,7 +1,7 @@
 const _MODE = import.meta.env.MODE as 'development' | 'production';
 
 const _HOSTS = {
-  development: 'http://192.168.10.109:80',
+  development: 'http://192.168.10.108:80',
   production: 'http://192.168.10.109:9099',
 };
 
@@ -18,5 +18,8 @@ export const APIS = {
     LIST: `${HOST}/${PREFIX}/screen/scene_linkage_config/list`,
     OPTIONS: `${HOST}/${PREFIX}/screen/scene_linkage_config/options`,
     ENDPOINT: `${HOST}/${PREFIX}/screen/scene_linkage_config`,
+  },
+  SETTING: {
+    SYSTEM_INFO: `${HOST}/${PREFIX}/sys/systeminfo`,
   },
 };

@@ -1,6 +1,9 @@
-export const QIERIES = {
+export const QUERIES = {
   LINKED_APP: {
     LIST: 'LINKED_APP_LIST',
     OPTIONS: 'LINKED_APP_OPTIONS',
+  },
+  SETTING: {
+    SYSTEM_INFO: 'SYSTEM_INFO',
   },
 };

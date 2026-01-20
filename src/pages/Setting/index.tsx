@@ -1,24 +1,31 @@
 import TransparentCard from '@/components/TransparentCard';
-import { Button, Flex } from 'antd';
+import { Button, Card, Flex } from 'antd';
 import { useState } from 'react';
+import LocalSetting from './LocalSetting';
 import classes from './style.module.css';
+import SystemInfo from './SystemInfo';
+import cardbg from '/assets/imgs/cardbg.png?url';
+console.log(cardbg);
 
 const items = [
   { key: 'localSetting', label: '本地设置' },
   { key: 'network', label: '网络服务配置' },
   { key: 'LLMConfig', label: '农业大模型助手配置' },
-  { key: 'system', label: '系统信息' },
+  { key: 'systemInfo', label: '系统信息' },
 ];
 
 export default function Setting() {
-  const [active, setActive] = useState('localSetting');
+  const [active, setActive] = useState('systemInfo');
 
   return (
     <div className={classes.setting}>
-      <TransparentCard style={{ height: '100%' }}>
+      <TransparentCard
+        style={{ height: '100%' }}
+        styles={{ body: { height: '100%' } }}
+      >
         <TransparentCard
           styles={{ body: { padding: 0 } }}
-          style={{ background: 'transparent' }}
+          style={{ background: 'transparent', marginBottom: 24 }}
         >
           <Flex wrap='nowrap'>
             {items.map((item) => (
@@ -35,6 +42,15 @@ export default function Setting() {
             ))}
           </Flex>
         </TransparentCard>
+        <Card
+          style={{
+            height: 'calc(100% - 34px - 24px)',
+            backgroundImage: `url(${cardbg})`,
+          }}
+        >
+          {active === 'localSetting' && <LocalSetting />}
+          {active === 'systemInfo' && <SystemInfo />}
+        </Card>
       </TransparentCard>
     </div>
   );

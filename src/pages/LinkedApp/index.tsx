@@ -5,7 +5,7 @@ import {
 } from '@/api/linked-app';
 import TransparentCard from '@/components/TransparentCard';
 import { MUTATIONS } from '@/constant/mutations';
-import { QIERIES } from '@/constant/queries';
+import { QUERIES } from '@/constant/queries';
 import type {
   ExecutionAction,
   LinkedAppFormValue,
@@ -44,7 +44,7 @@ export default function LinkedApp() {
   const [search, setSearch] = useSearchParams();
 
   const query = useQuery({
-    queryKey: [QIERIES.LINKED_APP.LIST],
+    queryKey: [QUERIES.LINKED_APP.LIST],
     queryFn: () => getLinkedAppList(location.search),
     initialData: {
       data: [],

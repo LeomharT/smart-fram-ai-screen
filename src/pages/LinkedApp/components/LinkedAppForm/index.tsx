@@ -4,7 +4,7 @@ import {
   putLinkedApp,
 } from '@/api/linked-app';
 import { MUTATIONS } from '@/constant/mutations';
-import { QIERIES } from '@/constant/queries';
+import { QUERIES } from '@/constant/queries';
 import type { LinkedAppFormValue } from '@/types/linked-app.type';
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -36,7 +36,7 @@ export default function LinkedAppForm(props: LinkedAppFormProps) {
   const [form] = Form.useForm<LinkedAppFormValue>();
 
   const query = useQuery({
-    queryKey: [QIERIES.LINKED_APP.OPTIONS],
+    queryKey: [QUERIES.LINKED_APP.OPTIONS],
     queryFn: getLinkedAppOptions,
     initialData: {
       actuator: [],

@@ -2,19 +2,21 @@ import TransparentCard from '@/components/TransparentCard';
 import { Button, Card, Flex } from 'antd';
 import { useState } from 'react';
 import LocalNetwork from './LocalNetwork';
+import NetworkConfig from './NetworkConfig';
 import classes from './style.module.css';
 import SystemInfo from './SystemInfo';
+import WebCam from './WebCam';
 import cardbg from '/assets/imgs/cardbg.png?url';
 
 const items = [
   { key: 'localNetwork', label: '本地设置' },
   { key: 'network', label: '网络服务配置' },
-  { key: 'LLMConfig', label: '农业大模型助手配置' },
+  { key: 'webcam', label: '网络摄像头' },
   { key: 'systemInfo', label: '系统信息' },
 ];
 
 export default function Setting() {
-  const [active, setActive] = useState('localNetwork');
+  const [active, setActive] = useState('webcam');
 
   return (
     <div className={classes.setting}>
@@ -48,6 +50,8 @@ export default function Setting() {
           }}
         >
           {active === 'localNetwork' && <LocalNetwork />}
+          {active === 'network' && <NetworkConfig />}
+          {active === 'webcam' && <WebCam />}
           {active === 'systemInfo' && <SystemInfo />}
         </Card>
       </TransparentCard>

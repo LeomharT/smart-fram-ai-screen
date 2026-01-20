@@ -8,5 +8,13 @@ export const MUTATIONS = {
     LOCAL_NETWORK: {
       POST: 'LOCAL_NETWORK_POST',
     },
+    NETWORK_CONFIG: {
+      CONNECTOR: {
+        PUT: 'CONNECTOR_PUT',
+      },
+      OPEN_PLATFORM: {
+        PUT: 'OPEN_PLATFORM_PUT',
+      },
+    },
   },
 };

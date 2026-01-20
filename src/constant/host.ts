@@ -22,5 +22,7 @@ export const APIS = {
   SETTING: {
     LOCAL_NETWORK: `${HOST}/${PREFIX}/sys/network-config`,
     SYSTEM_INFO: `${HOST}/${PREFIX}/sys/systeminfo`,
+    CONNECTOR: `${HOST}/${PREFIX}/aiot/northbound_connector/thingscloud`,
+    OPEN_PLATFORM: `${HOST}/${PREFIX}/aiot/northbound_connector/nifc/openapi`,
   },
 };

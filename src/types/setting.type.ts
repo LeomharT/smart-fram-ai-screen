@@ -17,3 +17,17 @@ export interface SystemInformation {
   storage: string;
   system_version: string;
 }
+
+export interface ConnectorConfig {
+  clientId: string;
+  ipAddr: string;
+  port: number;
+  secretKey: string;
+  userName: string;
+}
+
+export interface OpenPlatformConfig {
+  APP_ID: string;
+  APP_SECRET: string;
+  BASE_URL: string;
+}

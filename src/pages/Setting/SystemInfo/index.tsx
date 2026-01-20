@@ -1,4 +1,5 @@
 import { getSystemInfo } from '@/api/setting.api';
+import Loader from '@/components/Loader';
 import { QUERIES } from '@/constant/queries';
 import { useQuery } from '@tanstack/react-query';
 import { Descriptions, Flex } from 'antd';
@@ -23,12 +24,14 @@ export default function SystemInfo() {
 
   return (
     <Flex justify='center'>
-      <Descriptions
-        column={1}
-        style={{ width: 328 }}
-        title='系统信息'
-        items={items}
-      />
+      <Loader spinning={query.isFetching}>
+        <Descriptions
+          column={1}
+          style={{ width: 328 }}
+          title='系统信息'
+          items={items}
+        />
+      </Loader>
     </Flex>
   );
 }

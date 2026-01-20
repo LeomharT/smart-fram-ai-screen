@@ -1,14 +1,11 @@
 import { getLocalNetwork, postLocalNetwork } from '@/api/setting.api';
+import Loader from '@/components/Loader';
 import { MUTATIONS } from '@/constant/mutations';
 import { QUERIES } from '@/constant/queries';
 import type { LocalNetworkConfig } from '@/types/setting.type';
-import {
-  CheckOutlined,
-  InfoCircleOutlined,
-  LoadingOutlined,
-} from '@ant-design/icons';
+import { CheckOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { App, Button, Flex, Form, Input, Radio, Spin } from 'antd';
+import { App, Button, Flex, Form, Input, Radio } from 'antd';
 import { useEffect } from 'react';
 
 export default function LocalNetwork() {
@@ -50,7 +47,7 @@ export default function LocalNetwork() {
 
   return (
     <Flex justify='center'>
-      <Spin spinning={query.isFetching} indicator={<LoadingOutlined />}>
+      <Loader spinning={query.isFetching}>
         <Form
           form={form}
           style={{ minWidth: 416 }}
@@ -98,7 +95,7 @@ export default function LocalNetwork() {
             </Button>
           </Flex>
         </Form>
-      </Spin>
+      </Loader>
     </Flex>
   );
 }

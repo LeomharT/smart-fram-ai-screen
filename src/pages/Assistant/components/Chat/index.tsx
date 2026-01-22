@@ -140,6 +140,7 @@ export default function Chat() {
     mutationFn: spechToText,
     onSuccess(data?: string) {
       console.log(data);
+      senderRef.current?.insert(data as string);
     },
   });
 

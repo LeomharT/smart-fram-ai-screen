@@ -26,4 +26,8 @@ export const APIS = {
     OPEN_PLATFORM: `${HOST}/${PREFIX}/aiot/northbound_connector/nifc/openapi`,
     WEBCAM: `${HOST}/${PREFIX}/aiot/camera/system/config/rknn_ai.camera_rtsp`,
   },
+  ANALYSIS: {
+    SENSOR: `${HOST}/${PREFIX}/sensor/current-data`,
+    CHAT: `${HOST}/${PREFIX}/screen/llm/chat`,
+  },
 };

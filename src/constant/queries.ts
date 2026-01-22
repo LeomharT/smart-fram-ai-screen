@@ -10,4 +10,8 @@ export const QUERIES = {
     OPENPLATFORM: 'OPENPLATFORM',
     WEBCAM: 'WEBCAM',
   },
+  ANALYSIS: {},
+  ASSISTANT: {
+    SENSOR: 'SENSOR',
+  },
 };

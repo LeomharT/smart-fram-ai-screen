@@ -3,6 +3,7 @@ import {
   getLinkedAppList,
   putLinkedApp,
 } from '@/api/linked-app';
+import BackBtn from '@/components/BackBtn';
 import TransparentCard from '@/components/TransparentCard';
 import { MUTATIONS } from '@/constant/mutations';
 import { QUERIES } from '@/constant/queries';
@@ -237,6 +238,7 @@ export default function LinkedApp() {
 
   return (
     <div className={classes.apps}>
+      <BackBtn />
       <LinkedAppForm
         open={open}
         initialValue={initialValue}

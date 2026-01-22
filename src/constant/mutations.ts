@@ -20,4 +20,7 @@ export const MUTATIONS = {
       },
     },
   },
+  ASSISTANT: {
+    CHAT: 'CHAT',
+  },
 };

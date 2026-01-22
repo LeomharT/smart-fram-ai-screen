@@ -26,8 +26,16 @@ export default function SystemInfo() {
     <Flex justify='center'>
       <Loader spinning={query.isFetching}>
         <Descriptions
+          styles={{
+            content: {
+              fontSize: 18,
+            },
+            label: {
+              fontSize: 18,
+            },
+          }}
           column={1}
-          style={{ width: 328 }}
+          style={{ width: 580 }}
           title='系统信息'
           items={items}
         />

@@ -11,10 +11,25 @@ import {
 import { useMutation } from '@tanstack/react-query';
 import { App, Button, Card, Space, type GetRef } from 'antd';
 import { Avatar } from 'antd/lib';
+//@ts-ignore
+import lamejs from 'lamejs';
+//@ts-ignore
+import BitStream from 'lamejs/src/js/BitStream';
+//@ts-ignore
+import Lame from 'lamejs/src/js/Lame';
+//@ts-ignore
+import MPEGMode from 'lamejs/src/js/MPEGMode';
 import { useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import classes from './style.module.css';
 import ai from '/assets/imgs/icons/ai.svg?url';
+
+//@ts-ignore
+window.MPEGMode = MPEGMode;
+//@ts-ignore
+window.Lame = Lame;
+//@ts-ignore
+window.BitStream = BitStream;
 
 // const actionItems = [
 //   {
@@ -30,7 +45,7 @@ const genItem = (
   config?: Partial<BubbleItemType>,
 ) => {
   return {
-    key: config?.key ?? crypto.randomUUID(),
+    key: config?.key ?? '',
     role: isAI ? 'ai' : 'user',
     content: content,
     styles: {
@@ -56,7 +71,7 @@ export default function Chat() {
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
-  const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [, setAudioFile] = useState<File | null>(null);
 
   const [items, setItems] = useState<
     (BubbleItemType & { audioChunks: string[] })[]
@@ -64,7 +79,7 @@ export default function Chat() {
     genItem(
       true,
       '您好, 我是新大陆农业大模型AI助手, 可以帮您解答农业问题, 分析作物状况并生成农事报告',
-      { typing: false },
+      { typing: false, key: 'init' },
     ),
   ]);
 
@@ -87,7 +102,10 @@ export default function Chat() {
     mutationKey: [MUTATIONS.ASSISTANT.CHAT],
     mutationFn: async (data: Partial<ChatData>) => {
       setItems((prev) => {
-        return [...prev, genItem(true, '', { loading: true })];
+        return [
+          ...prev,
+          genItem(true, '', { loading: true, key: items.length }),
+        ];
       });
 
       return new Promise((resolve, reject) => {
@@ -135,7 +153,10 @@ export default function Chat() {
 
   function sendMessage(message: string) {
     setItems((prev) => {
-      return [...prev, genItem(false, message, { typing: false })];
+      return [
+        ...prev,
+        genItem(false, message, { typing: false, key: items.length }),
+      ];
     });
 
     senderRef.current?.clear();
@@ -184,6 +205,35 @@ export default function Chat() {
     }
   }
 
+  async function convertWebmToMp3(webmBlob: Blob): Promise<Blob> {
+    const arrayBuffer = await webmBlob.arrayBuffer();
+    const audioContext = new window.AudioContext();
+
+    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+    const encoder = new lamejs.Mp3Encoder(1, audioBuffer.sampleRate, 128);
+    const rawData = audioBuffer.getChannelData(0);
+
+    const samples = new Int16Array(rawData.length);
+    for (let i = 0; i < rawData.length; i++) {
+      samples[i] = rawData[i] < 0 ? rawData[i] * 0x8000 : rawData[i] * 0x7fff;
+    }
+
+    const mp3Data: Uint8Array[] = [];
+    const sampleBlockSize = 1152;
+
+    for (let i = 0; i < samples.length; i += sampleBlockSize) {
+      const chunk = samples.subarray(i, i + sampleBlockSize);
+      const mp3buf = encoder.encodeBuffer(chunk);
+      if (mp3buf.length > 0) mp3Data.push(mp3buf);
+    }
+
+    const endBuf = encoder.flush();
+    if (endBuf.length > 0) mp3Data.push(endBuf);
+    //@ts-ignore
+    return new Blob(mp3Data, { type: 'audio/mp3' });
+  }
+
   async function startRecording() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -195,18 +245,25 @@ export default function Chat() {
         if (event.data.size > 0) audioChunksRef.current.push(event.data);
       };
 
-      mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, {
+      mediaRecorder.onstop = async () => {
+        const webmBlob = new Blob(audioChunksRef.current, {
           type: 'audio/webm',
         });
-        const file = new File([audioBlob], `recording_${Date.now()}.webm`, {
-          type: 'audio/webm',
-        });
-        setAudioFile(file);
-        sttMutation.mutate(file);
-        console.log('录音封装完成:', file);
-      };
 
+        try {
+          const mp3Blob = await convertWebmToMp3(webmBlob);
+          const file = new File([mp3Blob], `audio_${Date.now()}.mp3`, {
+            type: 'audio/mp3',
+          });
+
+          setAudioFile(file);
+          sttMutation.mutate(file);
+          console.log('录音封装完成:', file);
+        } catch (error) {
+          message.error({ content: '音频格式转换失败', key: 'mp3-processing' });
+          console.error(error);
+        }
+      };
       mediaRecorder.start();
     } catch {
       message.error('无法访问麦克风');

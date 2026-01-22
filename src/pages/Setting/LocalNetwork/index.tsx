@@ -50,6 +50,7 @@ export default function LocalNetwork() {
       <Loader spinning={query.isFetching}>
         <Form
           form={form}
+          size='large'
           style={{ minWidth: 416 }}
           labelCol={{ span: 5 }}
           labelAlign='left'

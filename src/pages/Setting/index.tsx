@@ -1,3 +1,4 @@
+import BackBtn from '@/components/BackBtn';
 import TransparentCard from '@/components/TransparentCard';
 import { Button, Card, Flex } from 'antd';
 import { useState } from 'react';
@@ -20,6 +21,7 @@ export default function Setting() {
 
   return (
     <div className={classes.setting}>
+      <BackBtn />
       <TransparentCard
         style={{ height: '100%' }}
         styles={{ body: { height: '100%' } }}

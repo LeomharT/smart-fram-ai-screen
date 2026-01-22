@@ -39,6 +39,7 @@ export default function WebCam() {
       <Flex justify='center'>
         <Form
           form={form}
+          size='large'
           style={{ minWidth: 512 }}
           labelCol={{ span: 7 }}
           labelAlign='left'

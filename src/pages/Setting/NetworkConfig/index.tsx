@@ -91,6 +91,7 @@ export default function NetworkConfig() {
             <br />
             <Form
               form={connectorForm}
+              size='large'
               labelCol={{ span: 5 }}
               labelAlign='left'
               style={{ minWidth: 416 }}
@@ -162,6 +163,7 @@ export default function NetworkConfig() {
             <br />
             <Form
               form={openForm}
+              size='large'
               labelCol={{ span: 5 }}
               labelAlign='left'
               style={{ minWidth: 416 }}

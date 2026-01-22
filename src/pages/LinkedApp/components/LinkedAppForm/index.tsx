@@ -121,6 +121,7 @@ export default function LinkedAppForm(props: LinkedAppFormProps) {
     >
       <Form
         form={form}
+        size='large'
         onFinish={handleOnFinish}
         labelCol={{ span: 4 }}
         labelAlign='left'

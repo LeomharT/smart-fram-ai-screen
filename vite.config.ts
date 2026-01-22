@@ -10,4 +10,7 @@ export default defineConfig({
       '@': path.resolve(path.resolve(), './src'),
     },
   },
+  server: {
+    host: true,
+  },
 });

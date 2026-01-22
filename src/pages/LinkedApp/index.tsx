@@ -143,7 +143,7 @@ export default function LinkedApp() {
           <Space>
             <Button
               className={classes.action}
-              size='small'
+              size='large'
               variant='link'
               color='primary'
               onClick={() => {
@@ -160,7 +160,7 @@ export default function LinkedApp() {
             </Button>
             <Button
               className={classes.action}
-              size='small'
+              size='large'
               variant='link'
               color='primary'
               onClick={() => {
@@ -191,7 +191,7 @@ export default function LinkedApp() {
             <Button
               className={classes.action}
               danger
-              size='small'
+              size='large'
               type='link'
               onClick={() => {
                 modal.confirm({
@@ -261,12 +261,11 @@ export default function LinkedApp() {
           <br />
           <Table
             rowKey='id'
-            size='small'
+            size='large'
             loading={query.isFetching}
             columns={columns}
             dataSource={query.data.data}
             pagination={{
-              size: 'default',
               pageSize: 10,
               total: query.data.total,
               current: Number(search.get('pageNum') ?? 1),

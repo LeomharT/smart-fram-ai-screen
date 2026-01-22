@@ -60,6 +60,7 @@ export default function Analysis() {
     <div className={classes.analysis}>
       <BackBtn />
       <TransparentCard
+        loading={result.isFetching && !result.data}
         style={{ height: '100%' }}
         styles={{ body: { height: '100%' } }}
       >

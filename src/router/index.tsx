@@ -10,6 +10,8 @@ import AppShell from '../app';
 const Home = lazy(() => import('@/pages/Home/index'));
 const Analysis = lazy(() => import('@/pages/Analysis/index'));
 const Assistant = lazy(() => import('@/pages/Assistant/index'));
+const Report = lazy(() => import('@/pages/Assistant/components/Report/index'));
+
 const Setting = lazy(() => import('@/pages/Setting/index'));
 const LinkedApp = lazy(() => import('@/pages/LinkedApp/index'));
 
@@ -26,11 +28,10 @@ export const routes = createBrowserRouter(
         element={<Analysis />}
         handle={{ title: 'AI智能识别' }}
       />
-      <Route
-        path='assistant'
-        element={<Assistant />}
-        handle={{ title: '农业大模型助手' }}
-      />
+      <Route path='assistant' handle={{ title: '农业大模型助手' }}>
+        <Route index element={<Assistant />} />
+        <Route path='report' element={<Report />} />
+      </Route>
       <Route
         path='linkedApp'
         element={<LinkedApp />}

@@ -29,3 +29,12 @@ export interface ChatResponse {
   task_id: string;
   audio: string;
 }
+
+export interface ReportContent {
+  content: string;
+  createdAt: string;
+  generationProgress: string;
+  id: number;
+  modelName: string;
+  modelType: string;
+}

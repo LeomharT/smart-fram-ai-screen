@@ -16,5 +16,9 @@ export const QUERIES = {
   },
   ASSISTANT: {
     SENSOR: 'SENSOR',
+    REPORT: {
+      LIST: 'REPORT_LIST',
+      DETAIL: 'REPORT_DETAIL',
+    },
   },
 };

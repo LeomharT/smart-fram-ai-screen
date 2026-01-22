@@ -22,5 +22,6 @@ export const MUTATIONS = {
   },
   ASSISTANT: {
     CHAT: 'CHAT',
+    REPORT: 'REPORT',
   },
 };

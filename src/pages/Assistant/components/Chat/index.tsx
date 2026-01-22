@@ -1,3 +1,4 @@
+import { postReport } from '@/api/assistant.api';
 import { APIS } from '@/constant/host';
 import { MUTATIONS } from '@/constant/mutations';
 import type { ChatData, ChatResponse } from '@/types/assistant.type';
@@ -8,9 +9,10 @@ import {
   type BubbleListProps,
 } from '@ant-design/x';
 import { useMutation } from '@tanstack/react-query';
-import { Card, type GetRef } from 'antd';
+import { Button, Card, Space, type GetRef } from 'antd';
 import { Avatar } from 'antd/lib';
 import { useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router';
 import classes from './style.module.css';
 import ai from '/assets/imgs/icons/ai.svg?url';
 
@@ -44,6 +46,8 @@ const genItem = (
 };
 
 export default function Chat() {
+  const navigate = useNavigate();
+
   const listRef = useRef<GetRef<typeof Bubble.List>>(null);
 
   const senderRef = useRef<GetRef<typeof Sender>>(null);
@@ -107,6 +111,11 @@ export default function Chat() {
     },
   });
 
+  const reportMutation = useMutation({
+    mutationKey: [MUTATIONS.ASSISTANT.REPORT],
+    mutationFn: postReport,
+  });
+
   function sendMessage(message: string) {
     setItems((prev) => {
       return [...prev, genItem(false, message, { typing: false })];
@@ -150,8 +159,33 @@ export default function Chat() {
     });
   };
 
+  function handleOnRecord(recording: boolean) {
+    console.log(recording);
+  }
+
   return (
     <Card className={classes.chat} styles={{ body: { height: '100%' } }}>
+      <Space className={classes.btns} vertical>
+        <Button
+          type='primary'
+          shape='round'
+          onClick={() => reportMutation.mutate()}
+          loading={reportMutation.isPending}
+        >
+          一键生成农事报告
+        </Button>
+        <Button
+          variant='link'
+          color='primary'
+          block
+          shape='round'
+          onClick={() => {
+            navigate('report');
+          }}
+        >
+          查看农事报告
+        </Button>
+      </Space>
       <Bubble.List
         ref={listRef}
         items={items}
@@ -169,7 +203,7 @@ export default function Chat() {
       >
         <Sender
           ref={senderRef}
-          allowSpeech={{ onRecordingChange: console.log }}
+          allowSpeech={{ onRecordingChange: handleOnRecord }}
           autoSize={{ minRows: 3, maxRows: 3 }}
           loading={mutation.isPending}
           onSubmit={sendMessage}

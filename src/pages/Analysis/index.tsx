@@ -39,14 +39,6 @@ export default function Analysis() {
     label: false,
   };
 
-  console.log(
-    Object.keys(result.data?.distribution ?? {}).map((key) => ({
-      type: key,
-      label: key,
-      value: result.data?.distribution[key] ?? 0,
-    })),
-  );
-
   useEffect(() => {
     if (!result.isFetching) {
       if (result.data) {

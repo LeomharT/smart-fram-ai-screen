@@ -1,0 +1,28 @@
+.report {
+  height: 100%;
+  padding: 16px;
+  position: relative;
+}
+
+.content {
+  flex-grow: 4;
+}
+
+.list {
+  background: transparent;
+  height: 100%;
+  overflow: auto;
+}
+
+.item {
+  cursor: pointer;
+}
+
+.preview {
+  display: inline-block;
+  max-width: 300px;
+}
+
+.history {
+  flex-grow: 1 1 500px;
+}

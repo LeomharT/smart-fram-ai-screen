@@ -27,6 +27,10 @@ export const APIS = {
     WEBCAM: `${HOST}/${PREFIX}/aiot/camera/system/config/rknn_ai.camera_rtsp`,
   },
   ANALYSIS: {
+    RESULT: `${HOST}/${PREFIX}/sensor/detection-analysis-result`,
+    ALGORIGHM: `${HOST}/${PREFIX}/algorithm/deployment/current-deployment-info`,
+  },
+  ASSISTANT: {
     SENSOR: `${HOST}/${PREFIX}/sensor/current-data`,
     CHAT: `${HOST}/${PREFIX}/screen/llm/chat`,
   },

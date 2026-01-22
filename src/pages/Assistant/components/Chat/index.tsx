@@ -85,7 +85,7 @@ export default function Chat() {
           data as unknown as Record<string, string>,
         );
         const source = new EventSource(
-          APIS.ANALYSIS.CHAT + `?${search.toString()}`,
+          APIS.ASSISTANT.CHAT + `?${search.toString()}`,
         );
 
         source.onmessage = (ev) => {

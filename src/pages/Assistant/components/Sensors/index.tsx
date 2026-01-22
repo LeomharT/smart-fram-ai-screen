@@ -3,8 +3,13 @@ import Loader from '@/components/Loader';
 import { QUERIES } from '@/constant/queries';
 import { useQuery } from '@tanstack/react-query';
 import { Card, Flex, Image, Space, Typography } from 'antd';
-import ahumidity from '/assets/imgs/icons/ahumidity.svg?url';
-import atemp from '/assets/imgs/icons/atemp.svg?url';
+import co2 from '/assets/imgs/icons/co2.svg?url';
+import pm25 from '/assets/imgs/icons/PM2.5.svg?url';
+import tvoc from '/assets/imgs/icons/tvoc.svg?url';
+import light from '/assets/imgs/icons/光照强度.svg?url';
+import pressure from '/assets/imgs/icons/大气压强.svg?url';
+import temp from '/assets/imgs/icons/温度.svg?url';
+import wet from '/assets/imgs/icons/湿度.svg?url';
 
 export default function Sensors() {
   const query = useQuery({
@@ -23,22 +28,46 @@ export default function Sensors() {
 
   const items = [
     {
-      key: 'atemp',
-      lable: '大气温度',
+      key: 'co2',
+      lable: 'CO2',
+      ...query.data?.CO2,
+      icon: co2,
+    },
+    {
+      key: 'PM2.5',
+      lable: 'PM2.5',
+      ...query.data?.['PM2.5'],
+      icon: pm25,
+    },
+    {
+      key: 'TVOC',
+      lable: 'TVOC',
+      ...query.data?.TVOC,
+      icon: tvoc,
+    },
+    {
+      key: '光照强度',
+      lable: '光照强度',
+      ...query.data?.光照强度,
+      icon: light,
+    },
+    {
+      key: '大气压强',
+      lable: '大气压强',
+      ...query.data?.大气压强,
+      icon: pressure,
+    },
+    {
+      key: '温度',
+      lable: '温度',
       ...query.data?.温度,
-      icon: atemp,
+      icon: temp,
     },
     {
-      key: 'ahumidity',
-      lable: '大气湿度',
+      key: '湿度',
+      lable: '湿度',
       ...query.data?.湿度,
-      icon: ahumidity,
-    },
-    {
-      key: 'ahumidity1',
-      lable: '大气湿度',
-      ...query.data?.湿度,
-      icon: ahumidity,
+      icon: wet,
     },
   ];
 

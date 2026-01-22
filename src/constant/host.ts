@@ -33,6 +33,7 @@ export const APIS = {
   ASSISTANT: {
     SENSOR: `${HOST}/${PREFIX}/sensor/current-data`,
     CHAT: `${HOST}/${PREFIX}/screen/llm/chat`,
+    STT: `${HOST}/${PREFIX}/screen/llm/audio2text`,
     REPORT: {
       POST: `${HOST}/${PREFIX}/screen/llm/gen_report`,
       LIST: `${HOST}/${PREFIX}/screen/report_history/list`,

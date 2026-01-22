@@ -1,4 +1,4 @@
-import { postReport } from '@/api/assistant.api';
+import { postReport, spechToText } from '@/api/assistant.api';
 import { APIS } from '@/constant/host';
 import { MUTATIONS } from '@/constant/mutations';
 import type { ChatData, ChatResponse } from '@/types/assistant.type';
@@ -9,7 +9,7 @@ import {
   type BubbleListProps,
 } from '@ant-design/x';
 import { useMutation } from '@tanstack/react-query';
-import { Button, Card, Space, type GetRef } from 'antd';
+import { App, Button, Card, Space, type GetRef } from 'antd';
 import { Avatar } from 'antd/lib';
 import { useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -46,11 +46,17 @@ const genItem = (
 };
 
 export default function Chat() {
+  const { message } = App.useApp();
+
   const navigate = useNavigate();
 
   const listRef = useRef<GetRef<typeof Bubble.List>>(null);
 
   const senderRef = useRef<GetRef<typeof Sender>>(null);
+
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const [audioFile, setAudioFile] = useState<File | null>(null);
 
   const [items, setItems] = useState<
     (BubbleItemType & { audioChunks: string[] })[]
@@ -111,9 +117,20 @@ export default function Chat() {
     },
   });
 
+  const sttMutation = useMutation({
+    mutationKey: [MUTATIONS.ASSISTANT.STT],
+    mutationFn: spechToText,
+    onSuccess(data?: string) {
+      console.log(data);
+    },
+  });
+
   const reportMutation = useMutation({
     mutationKey: [MUTATIONS.ASSISTANT.REPORT],
     mutationFn: postReport,
+    onSuccess() {
+      message.success('报告生成成功');
+    },
   });
 
   function sendMessage(message: string) {
@@ -159,9 +176,49 @@ export default function Chat() {
     });
   };
 
-  function handleOnRecord(recording: boolean) {
-    console.log(recording);
+  async function handleOnRecord(recording: boolean) {
+    if (recording) {
+      startRecording();
+    } else {
+      stopRecording();
+    }
   }
+
+  async function startRecording() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) audioChunksRef.current.push(event.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, {
+          type: 'audio/webm',
+        });
+        const file = new File([audioBlob], `recording_${Date.now()}.webm`, {
+          type: 'audio/webm',
+        });
+        setAudioFile(file);
+        sttMutation.mutate(file);
+        console.log('录音封装完成:', file);
+      };
+
+      mediaRecorder.start();
+    } catch {
+      message.error('无法访问麦克风');
+    }
+  }
+
+  const stopRecording = () => {
+    mediaRecorderRef.current?.stop();
+    mediaRecorderRef.current?.stream
+      .getTracks()
+      .forEach((track) => track.stop());
+  };
 
   return (
     <Card className={classes.chat} styles={{ body: { height: '100%' } }}>

@@ -20,3 +20,15 @@ export async function getReportList() {
   );
   return res?.rows;
 }
+
+export async function spechToText(audio: File) {
+  const formData = new FormData();
+  formData.set('file', audio);
+
+  const res = await fetchData<string>(APIS.ASSISTANT.STT, {
+    method: 'POST',
+    body: formData,
+  });
+
+  return res?.data;
+}

@@ -3,6 +3,7 @@ import { APIS } from '@/constant/host';
 import { MUTATIONS } from '@/constant/mutations';
 import type { ChatData, ChatResponse } from '@/types/assistant.type';
 import {
+  Actions,
   Bubble,
   Sender,
   type BubbleItemType,
@@ -18,8 +19,10 @@ import BitStream from 'lamejs/src/js/BitStream';
 //@ts-ignore
 import Lame from 'lamejs/src/js/Lame';
 //@ts-ignore
+import { SoundOutlined } from '@ant-design/icons';
+//@ts-ignore
 import MPEGMode from 'lamejs/src/js/MPEGMode';
-import { useMemo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import classes from './style.module.css';
 import ai from '/assets/imgs/icons/ai.svg?url';
@@ -31,13 +34,13 @@ window.Lame = Lame;
 //@ts-ignore
 window.BitStream = BitStream;
 
-// const actionItems = [
-//   {
-//     key: 'sound',
-//     icon: <SoundOutlined style={{ fontSize: 16, color: '#fff' }} />,
-//     label: '语音播放',
-//   },
-// ];
+const actionItems = [
+  {
+    key: 'sound',
+    icon: <SoundOutlined style={{ fontSize: 16, color: '#fff' }} />,
+    label: '语音播放',
+  },
+];
 
 const genItem = (
   isAI: boolean,
@@ -85,20 +88,48 @@ export default function Chat() {
     ),
   ]);
 
-  const memoRole: BubbleListProps['role'] = useMemo(
-    () => ({
-      ai: {
-        typing: true,
-        avatar: () => <Avatar src={ai} />,
-        footer: () => null,
-      },
-      user: {
-        placement: 'end',
-        typing: true,
-      },
-    }),
-    [],
-  );
+  const memoRole: BubbleListProps['role'] = {
+    ai: {
+      typing: true,
+      avatar: () => <Avatar src={ai} />,
+      footer: (_, { key }) => (
+        <Actions
+          items={actionItems}
+          onClick={async () => {
+            const item = items.filter((item) => item.key === key)[0];
+            if (item) {
+              const audioCtx = new (
+                window.AudioContext || (window as any).webkitAudioContext
+              )();
+
+              for (const base64 of item.audioChunks) {
+                try {
+                  const arrayBuffer = base64ToArrayBuffer(base64);
+                  const audioBuffer =
+                    await audioCtx.decodeAudioData(arrayBuffer);
+
+                  const source = audioCtx.createBufferSource();
+                  source.buffer = audioBuffer;
+                  source.connect(audioCtx.destination);
+
+                  await new Promise((resolve) => {
+                    source.onended = resolve;
+                    source.start(0);
+                  });
+                } catch (e) {
+                  console.error('音频片段解码失败', e);
+                }
+              }
+            }
+          }}
+        />
+      ),
+    },
+    user: {
+      placement: 'end',
+      typing: true,
+    },
+  };
 
   const mutation = useMutation({
     mutationKey: [MUTATIONS.ASSISTANT.CHAT],
@@ -340,3 +371,12 @@ export default function Chat() {
     </Card>
   );
 }
+
+const base64ToArrayBuffer = (base64: string) => {
+  const binaryString = window.atob(base64);
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes.buffer;
+};

@@ -21,6 +21,7 @@ export default defineConfig([
     },
     rules: {
       '@typescript-eslint/ban-ts-comment': 'warn',
+      '@typescript-eslint/no-explicit-any': 'warn',
     },
   },
 ]);

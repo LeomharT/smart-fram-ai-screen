@@ -328,7 +328,10 @@ export default function Chat() {
           classNames={{
             suffix: classes.suffix,
           }}
-          allowSpeech={{ onRecordingChange: handleOnRecord, recording }}
+          allowSpeech={{
+            onRecordingChange: handleOnRecord,
+            recording: recording || sttMutation.isPending,
+          }}
           autoSize={{ minRows: 3, maxRows: 3 }}
           loading={mutation.isPending}
           onSubmit={sendMessage}

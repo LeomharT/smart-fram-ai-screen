@@ -15,11 +15,11 @@
 
 .suffix {
   & button {
-    width: 48px !important;
-    height: 48px !important;
+    width: 58px !important;
+    height: 58px !important;
   }
 
   & span {
-    font-size: 24px;
+    font-size: 36px;
   }
 }

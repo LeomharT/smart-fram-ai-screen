@@ -2,7 +2,7 @@ const _MODE = import.meta.env.MODE as 'development' | 'production';
 
 const _HOSTS = {
   development: 'http://127.0.0.1:80',
-  production: 'http://192.168.10.109:9099',
+  production: 'http://127.0.0.1:80',
 };
 
 const _PREFIXS = {

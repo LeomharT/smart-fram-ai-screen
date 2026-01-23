@@ -47,18 +47,14 @@
 }
 
 .content {
-  height: calc(100% - 40px - 220px);
+  height: calc(100% - 40px - 180px);
   padding-top: 32px;
   justify-content: space-between;
   gap: 48px;
 }
 
-.img {
-  width: 30%;
-}
-
 .history {
-  height: 220px;
+  height: 180px;
   width: 100%;
   overflow: auto;
   background: transparent;

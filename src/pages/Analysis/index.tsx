@@ -43,7 +43,7 @@ export default function Analysis() {
     if (!result.isFetching) {
       if (result.data) {
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        setHistory((prev) => [...prev, result.data!]);
+        setHistory((prev) => [result.data!, ...prev]);
       }
     }
   }, [result.data, result.isFetching]);
@@ -52,7 +52,7 @@ export default function Analysis() {
     <div className={classes.analysis}>
       <BackBtn />
       <TransparentCard
-        loading={result.isFetching && !result.data}
+        // loading={result.isFetching && !result.data}
         style={{ height: '100%' }}
         styles={{ body: { height: '100%' } }}
       >
@@ -82,9 +82,8 @@ export default function Analysis() {
         <Flex className={classes.content}>
           <Flex vertical gap={16}>
             <Image
-              width={580}
-              height={360}
-              className={classes.img}
+              width={480}
+              height={300}
               src={`data:image/png;base64,` + (result.data?.imageBase64 ?? '')}
             />
             <Button
@@ -131,13 +130,14 @@ export default function Analysis() {
             )}
             <AnalysisResultContent
               label='检测结果'
-              content={<Pie width={320} height={320} {...config} />}
+              content={<Pie width={250} height={250} {...config} />}
             />
           </Flex>
         </Flex>
-        <Card className={classes.history}>
+        <Card className={classes.history} styles={{ body: { padding: 12 } }}>
           <Flex gap={12}>
             <Typography.Title
+              level={2}
               style={{
                 writingMode: 'vertical-lr',
                 color: 'white',
@@ -154,11 +154,11 @@ export default function Analysis() {
                 style={{ minWidth: 'max-content', background: '#005C25' }}
               >
                 <Image
-                  height={90}
+                  height={80}
                   preview={false}
                   src={`data:image/png;base64,` + (v?.imageBase64 ?? '')}
                 />
-                <Space vertical style={{ padding: 12 }}>
+                <Space vertical style={{ padding: 2 }} size={0}>
                   <Typography.Text style={{ color: '#fff' }}>
                     {v.detectedLabels}
                   </Typography.Text>

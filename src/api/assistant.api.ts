@@ -30,5 +30,9 @@ export async function spechToText(audio: File) {
     body: formData,
   });
 
+  if (res?.error) {
+    throw new Error(res.error);
+  }
+
   return res?.data;
 }

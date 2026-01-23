@@ -69,6 +69,8 @@ export default function Chat() {
 
   const senderRef = useRef<GetRef<typeof Sender>>(null);
 
+  const [recording, setRecording] = useState(false);
+
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const [, setAudioFile] = useState<File | null>(null);
@@ -142,6 +144,10 @@ export default function Chat() {
       console.log(data);
       senderRef.current?.insert(data as string);
     },
+    onError(err) {
+      message.error(err.message);
+      setRecording(false);
+    },
   });
 
   const reportMutation = useMutation({
@@ -199,6 +205,7 @@ export default function Chat() {
   };
 
   async function handleOnRecord(recording: boolean) {
+    setRecording(recording);
     if (recording) {
       startRecording();
     } else {
@@ -318,7 +325,7 @@ export default function Chat() {
       >
         <Sender
           ref={senderRef}
-          allowSpeech={{ onRecordingChange: handleOnRecord }}
+          allowSpeech={{ onRecordingChange: handleOnRecord, recording }}
           autoSize={{ minRows: 3, maxRows: 3 }}
           loading={mutation.isPending}
           onSubmit={sendMessage}

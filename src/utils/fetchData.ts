@@ -8,6 +8,7 @@ type BackendResponse<T, M> = {
   meta: M;
   message?: string;
   total?: number;
+  error?: string;
 };
 
 export type DefaultMeta = {

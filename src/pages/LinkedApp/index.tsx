@@ -248,6 +248,7 @@ export default function LinkedApp() {
       <TransparentCard style={{ height: '100%' }}>
         <Flex wrap='nowrap' gap={16}>
           <Button
+            size='large'
             type='primary'
             icon={<PlusOutlined />}
             onClick={() => setOpen(true)}

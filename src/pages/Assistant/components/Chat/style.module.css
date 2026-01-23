@@ -12,3 +12,14 @@
   position: absolute;
   right: 24px;
 }
+
+.suffix {
+  & button {
+    width: 48px !important;
+    height: 48px !important;
+  }
+
+  & span {
+    font-size: 24px;
+  }
+}

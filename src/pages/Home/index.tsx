@@ -1,4 +1,3 @@
-import { Button } from 'antd';
 import { useNavigate } from 'react-router';
 import classes from './style.module.css';
 import navi_1 from '/assets/imgs/navi_1.png?url';
@@ -41,10 +40,9 @@ export default function Home() {
             key={index}
             className={classes.item}
             style={{ backgroundImage: `url(${value.src})` }}
+            onClick={() => navigate(value.url)}
           >
-            <Button ghost onClick={() => navigate(value.url)}>
-              {value.label}
-            </Button>
+            <button>{value.label}</button>
           </div>
         ))}
       </div>

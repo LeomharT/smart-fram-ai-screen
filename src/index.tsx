@@ -11,3 +11,6 @@ root.render(
     <RouterProvider router={routes} />
   </StrictMode>,
 );
+
+console.log(window.devicePixelRatio);
+console.log(window.innerWidth, window.innerHeight);

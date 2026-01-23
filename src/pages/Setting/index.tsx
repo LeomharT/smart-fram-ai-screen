@@ -17,7 +17,7 @@ const items = [
 ];
 
 export default function Setting() {
-  const [active, setActive] = useState('webcam');
+  const [active, setActive] = useState('localNetwork');
 
   return (
     <div className={classes.setting}>
@@ -34,9 +34,10 @@ export default function Setting() {
             {items.map((item) => (
               <Button
                 key={item.key}
+                block
                 type={active === item.key ? 'primary' : 'default'}
                 ghost={active !== item.key}
-                block
+                size='large'
                 style={{ border: 'none' }}
                 onClick={() => setActive(item.key)}
               >

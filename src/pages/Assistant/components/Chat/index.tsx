@@ -98,28 +98,17 @@ export default function Chat() {
           onClick={async () => {
             const item = items.filter((item) => item.key === key)[0];
             if (item) {
-              const audioCtx = new (
-                window.AudioContext || (window as any).webkitAudioContext
-              )();
+              const byteArrays = item.audioChunks.map(
+                (base64) => new Uint8Array(base64ToArrayBuffer(base64)),
+              );
 
-              for (const base64 of item.audioChunks) {
-                try {
-                  const arrayBuffer = base64ToArrayBuffer(base64);
-                  const audioBuffer =
-                    await audioCtx.decodeAudioData(arrayBuffer);
+              const combinedBlob = new Blob(byteArrays, { type: 'audio/mp3' });
 
-                  const source = audioCtx.createBufferSource();
-                  source.buffer = audioBuffer;
-                  source.connect(audioCtx.destination);
+              const url = URL.createObjectURL(combinedBlob);
+              const audio = new Audio(url);
+              audio.play();
 
-                  await new Promise((resolve) => {
-                    source.onended = resolve;
-                    source.start(0);
-                  });
-                } catch (e) {
-                  console.error('音频片段解码失败', e);
-                }
-              }
+              audio.onended = () => URL.revokeObjectURL(url);
             }
           }}
         />

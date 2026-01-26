@@ -6,6 +6,7 @@ import type { ReportContent } from '@/types/assistant.type';
 import { useQuery } from '@tanstack/react-query';
 import { Card, Divider, Flex, Space, Typography } from 'antd';
 import { useState } from 'react';
+import Markdown from 'react-markdown';
 import classes from './style.module.css';
 
 const formater = new Intl.DateTimeFormat('zh-CN', {
@@ -42,7 +43,7 @@ export default function Report() {
                     作物: {selected?.modelName}
                   </Typography.Title>
                 </Space>
-                <pre style={{ fontSize: 18 }}>{selected?.content}</pre>
+                <Markdown>{selected?.content}</Markdown>
               </Flex>
             </Card>
           </div>
@@ -73,9 +74,7 @@ export default function Report() {
                       </Typography.Title>
                     </Space>
                     <br />
-                    <span className={classes.preview}>
-                      {item.content.slice(0, 50)}
-                    </span>
+                    <Markdown>{item.content.slice(0, 45)}</Markdown>
                   </Card>
                 ))}
               </Flex>

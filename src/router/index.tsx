@@ -27,9 +27,17 @@ export const routes = createBrowserRouter(
         element={<Analysis />}
         handle={{ title: 'AI智能识别' }}
       />
-      <Route path='assistant' handle={{ title: '农业大模型助手' }}>
-        <Route index element={<Assistant />} />
-        <Route path='report' element={<Report />} />
+      <Route path='assistant'>
+        <Route
+          index
+          element={<Assistant />}
+          handle={{ title: '农业大模型助手' }}
+        />
+        <Route
+          path='report'
+          element={<Report />}
+          handle={{ title: '农事报告' }}
+        />
       </Route>
       <Route
         path='linkedApp'

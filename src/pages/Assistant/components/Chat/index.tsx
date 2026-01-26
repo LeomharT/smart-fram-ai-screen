@@ -74,9 +74,15 @@ export default function Chat() {
 
   const [recording, setRecording] = useState(false);
 
+  const eventSourceRef = useRef<EventSource>(null);
+
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+
   const audioChunksRef = useRef<Blob[]>([]);
+
   const [, setAudioFile] = useState<File | null>(null);
+
+  const isPlaying = useRef(false);
 
   const [items, setItems] = useState<
     (BubbleItemType & { audioChunks: string[] })[]
@@ -130,6 +136,8 @@ export default function Chat() {
         ];
       });
 
+      eventSourceRef.current?.close();
+
       return new Promise((resolve, reject) => {
         const search = new URLSearchParams(
           data as unknown as Record<string, string>,
@@ -137,12 +145,15 @@ export default function Chat() {
         const source = new EventSource(
           APIS.ASSISTANT.CHAT + `?${search.toString()}`,
         );
+        eventSourceRef.current = source;
 
         source.onmessage = (ev) => {
           const data: ChatResponse = JSON.parse(ev.data);
 
           if (data.event === 'message') updateLastAIChatContent(data.answer);
-          if (data.event === 'tts_message') updateLastAIChatAudio(data.audio);
+          if (data.event === 'tts_message') {
+            updateLastAIChatAudio(data.audio);
+          }
 
           if (data.event === 'tts_message_end') {
             source.close();
@@ -305,6 +316,21 @@ export default function Chat() {
       .forEach((track) => track.stop());
   };
 
+  const cancelMutation = () => {
+    eventSourceRef.current?.close();
+    eventSourceRef.current = null;
+
+    setItems((prev) => {
+      if (prev.length === 0) return prev;
+      const lastItem = prev[prev.length - 1];
+      if (lastItem.role === 'ai' && lastItem.loading) {
+        return prev.slice(0, -1);
+      }
+      return prev;
+    });
+    mutation.reset();
+  };
+
   return (
     <Card className={classes.chat} styles={{ body: { height: '100%' } }}>
       <Space className={classes.btns} vertical>
@@ -355,6 +381,9 @@ export default function Chat() {
           autoSize={{ minRows: 3, maxRows: 3 }}
           loading={mutation.isPending}
           onSubmit={sendMessage}
+          onCancel={() => {
+            cancelMutation();
+          }}
         />
       </Card>
     </Card>

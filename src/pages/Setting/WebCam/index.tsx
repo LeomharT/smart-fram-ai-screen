@@ -53,14 +53,6 @@ export default function WebCam() {
           >
             <Input />
           </Form.Item>
-          <Form.Item
-            label='鉴权参数'
-            name='configKey'
-            required
-            rules={[{ required: true }]}
-          >
-            <Input />
-          </Form.Item>
           <Flex justify='center'>
             <Button
               type='primary'

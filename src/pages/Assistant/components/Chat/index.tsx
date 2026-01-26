@@ -22,7 +22,7 @@ import Lame from 'lamejs/src/js/Lame';
 import { SoundOutlined } from '@ant-design/icons';
 //@ts-ignore
 import MPEGMode from 'lamejs/src/js/MPEGMode';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import classes from './style.module.css';
 import ai from '/assets/imgs/icons/ai.svg?url';
@@ -77,12 +77,11 @@ export default function Chat() {
   const eventSourceRef = useRef<EventSource>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-
   const audioChunksRef = useRef<Blob[]>([]);
-
   const [, setAudioFile] = useState<File | null>(null);
 
-  const isPlaying = useRef(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [playing, setPlaying] = useState('');
 
   const [items, setItems] = useState<
     (BubbleItemType & { audioChunks: string[] })[]
@@ -98,27 +97,65 @@ export default function Chat() {
     ai: {
       typing: true,
       avatar: () => <Avatar src={ai} />,
-      footer: (_, { key }) => (
-        <Actions
-          items={actionItems}
-          onClick={async () => {
-            const item = items.filter((item) => item.key === key)[0];
-            if (item) {
-              const byteArrays = item.audioChunks.map(
-                (base64) => new Uint8Array(base64ToArrayBuffer(base64)),
-              );
+      footer: (_, { key }) => {
+        if (key === 'init') return null;
 
-              const combinedBlob = new Blob(byteArrays, { type: 'audio/mp3' });
+        return (
+          <Button
+            size='small'
+            type='text'
+            styles={{ icon: { fontSize: 16, color: '#fff' } }}
+            loading={mutation.isPending || playing === key}
+            icon={<SoundOutlined style={{ fontSize: 16, color: '#fff' }} />}
+            onClick={() => {
+              setPlaying(key as string);
+              const item = items.filter((item) => item.key === key)[0];
+              if (item) {
+                const byteArrays = item.audioChunks.map(
+                  (base64) => new Uint8Array(base64ToArrayBuffer(base64)),
+                );
 
-              const url = URL.createObjectURL(combinedBlob);
-              const audio = new Audio(url);
-              audio.play();
+                const combinedBlob = new Blob(byteArrays, {
+                  type: 'audio/mp3',
+                });
 
-              audio.onended = () => URL.revokeObjectURL(url);
-            }
-          }}
-        />
-      ),
+                const url = URL.createObjectURL(combinedBlob);
+                audioRef.current = new Audio(url);
+                audioRef.current.play();
+
+                audioRef.current.onended = () => {
+                  URL.revokeObjectURL(url);
+                  setPlaying('');
+                };
+              }
+            }}
+          />
+        );
+
+        return (
+          <Actions
+            items={actionItems}
+            onClick={async () => {
+              const item = items.filter((item) => item.key === key)[0];
+              if (item) {
+                const byteArrays = item.audioChunks.map(
+                  (base64) => new Uint8Array(base64ToArrayBuffer(base64)),
+                );
+
+                const combinedBlob = new Blob(byteArrays, {
+                  type: 'audio/mp3',
+                });
+
+                const url = URL.createObjectURL(combinedBlob);
+                const audio = new Audio(url);
+                audio.play();
+
+                audio.onended = () => URL.revokeObjectURL(url);
+              }
+            }}
+          />
+        );
+      },
     },
     user: {
       placement: 'end',
@@ -151,9 +188,7 @@ export default function Chat() {
           const data: ChatResponse = JSON.parse(ev.data);
 
           if (data.event === 'message') updateLastAIChatContent(data.answer);
-          if (data.event === 'tts_message') {
-            updateLastAIChatAudio(data.audio);
-          }
+          if (data.event === 'tts_message') updateLastAIChatAudio(data.audio);
 
           if (data.event === 'tts_message_end') {
             source.close();
@@ -199,6 +234,9 @@ export default function Chat() {
 
     senderRef.current?.clear();
     listRef.current?.scrollTo({ top: 'bottom', behavior: 'instant' });
+
+    audioRef.current?.pause();
+    audioRef.current = null;
 
     mutation.mutate({ query: message });
   }
@@ -330,6 +368,13 @@ export default function Chat() {
     });
     mutation.reset();
   };
+
+  useEffect(() => {
+    return () => {
+      audioRef.current?.pause();
+      audioRef.current = null;
+    };
+  }, []);
 
   return (
     <Card className={classes.chat} styles={{ body: { height: '100%' } }}>

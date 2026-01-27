@@ -81,7 +81,12 @@ export default function Chat() {
   const [, setAudioFile] = useState<File | null>(null);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [playing, setPlaying] = useState('');
+  const mediaSourceRef = useRef<MediaSource | null>(null);
+  const urlRef = useRef<string>('');
+
+  const ttsChunkRef = useRef<string[]>([]);
+  const sourceBufferRef = useRef<SourceBuffer | null>(null);
+  const queueRef = useRef<Uint8Array[]>([]);
 
   const [items, setItems] = useState<
     (BubbleItemType & { audioChunks: string[] })[]
@@ -98,40 +103,7 @@ export default function Chat() {
       typing: true,
       avatar: () => <Avatar src={ai} />,
       footer: (_, { key }) => {
-        if (key === 'init') return null;
-
-        return (
-          <Button
-            size='small'
-            type='text'
-            styles={{ icon: { fontSize: 16, color: '#fff' } }}
-            loading={mutation.isPending || playing === key}
-            icon={<SoundOutlined style={{ fontSize: 16, color: '#fff' }} />}
-            onClick={() => {
-              setPlaying(key as string);
-              const item = items.filter((item) => item.key === key)[0];
-              if (item) {
-                const byteArrays = item.audioChunks.map(
-                  (base64) => new Uint8Array(base64ToArrayBuffer(base64)),
-                );
-
-                const combinedBlob = new Blob(byteArrays, {
-                  type: 'audio/mp3',
-                });
-
-                const url = URL.createObjectURL(combinedBlob);
-                audioRef.current = new Audio(url);
-                audioRef.current.play();
-
-                audioRef.current.onended = () => {
-                  URL.revokeObjectURL(url);
-                  setPlaying('');
-                };
-              }
-            }}
-          />
-        );
-
+        return null;
         return (
           <Actions
             items={actionItems}
@@ -173,6 +145,8 @@ export default function Chat() {
         ];
       });
 
+      audioRef.current?.pause();
+      ttsChunkRef.current = [];
       eventSourceRef.current?.close();
 
       return new Promise((resolve, reject) => {
@@ -188,9 +162,21 @@ export default function Chat() {
           const data: ChatResponse = JSON.parse(ev.data);
 
           if (data.event === 'message') updateLastAIChatContent(data.answer);
-          if (data.event === 'tts_message') updateLastAIChatAudio(data.audio);
+          if (data.event === 'tts_message') {
+            const buffer = new Uint8Array(base64ToArrayBuffer(data.audio));
+            queueRef.current.push(buffer);
+
+            if (queueRef.current.length === 5 && !mediaSourceRef.current) {
+              playAudio();
+            } else {
+              processQueue();
+            }
+          }
 
           if (data.event === 'tts_message_end') {
+            if (mediaSourceRef.current?.readyState === 'open') {
+              mediaSourceRef.current.endOfStream();
+            }
             source.close();
             resolve('success');
           }
@@ -232,11 +218,16 @@ export default function Chat() {
       ];
     });
 
+    resetAudioEngine();
+
     senderRef.current?.clear();
     listRef.current?.scrollTo({ top: 'bottom', behavior: 'instant' });
 
     audioRef.current?.pause();
     audioRef.current = null;
+
+    if (!audioRef.current) audioRef.current = new Audio();
+    audioRef.current.play().catch(() => {});
 
     mutation.mutate({ query: message });
   }
@@ -250,22 +241,6 @@ export default function Chat() {
           ...lastItem,
           loading: false,
           content: lastItem.content + content,
-        };
-        return newItems;
-      }
-      return prev;
-    });
-  };
-
-  const updateLastAIChatAudio = (audioChunk: string) => {
-    setItems((prev) => {
-      const lastItem = prev[prev.length - 1];
-      if (lastItem && lastItem.role === 'ai') {
-        const newItems = [...prev];
-        const audioChunks = lastItem.audioChunks || [];
-        newItems[newItems.length - 1] = {
-          ...lastItem,
-          audioChunks: [...audioChunks, audioChunk],
         };
         return newItems;
       }
@@ -369,10 +344,74 @@ export default function Chat() {
     mutation.reset();
   };
 
+  function playAudio() {
+    resetAudioEngine();
+
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+    }
+
+    const ms = new MediaSource();
+    mediaSourceRef.current = ms;
+    const url = URL.createObjectURL(ms);
+    urlRef.current = url;
+    audioRef.current.src = url;
+
+    ms.addEventListener('sourceopen', () => {
+      if (ms.sourceBuffers.length > 0) return;
+
+      const sb = ms.addSourceBuffer('audio/mpeg');
+      sourceBufferRef.current = sb;
+
+      // 当这一片数据处理完，尝试追加下一片
+      sb.addEventListener('updateend', () => {
+        processQueue();
+      });
+
+      audioRef.current?.play().catch((e) => console.error('播放失败 ', e));
+
+      // 初始启动：如果已经有数据在队列里了
+      processQueue();
+    });
+  }
+
+  function processQueue() {
+    const sb = sourceBufferRef.current;
+    if (!sb || sb.updating || queueRef.current.length === 0) return;
+
+    const nextChunk = queueRef.current.shift();
+    if (nextChunk) {
+      try {
+        sb.appendBuffer(nextChunk as any);
+      } catch (e) {
+        console.error('AppendBuffer Failed', e);
+      }
+    }
+  }
+
+  const resetAudioEngine = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.onended = null;
+      audioRef.current.src = '';
+      audioRef.current.load();
+    }
+
+    if (urlRef.current) {
+      URL.revokeObjectURL(urlRef.current);
+      urlRef.current = '';
+    }
+
+    mediaSourceRef.current = null;
+    sourceBufferRef.current = null;
+
+    queueRef.current = [];
+    ttsChunkRef.current = [];
+  };
+
   useEffect(() => {
     return () => {
       audioRef.current?.pause();
-      audioRef.current = null;
     };
   }, []);
 
@@ -428,6 +467,7 @@ export default function Chat() {
           onSubmit={sendMessage}
           onCancel={() => {
             cancelMutation();
+            resetAudioEngine();
           }}
         />
       </Card>

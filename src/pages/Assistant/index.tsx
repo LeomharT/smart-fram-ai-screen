@@ -11,7 +11,7 @@ export default function Assistant() {
       <BackBtn />
       <TransparentCard
         style={{ height: '100%' }}
-        styles={{ body: { height: 'calc(100% - 24px)' } }}
+        styles={{ body: { height: 'calc(100%)' } }}
       >
         <Flex orientation='vertical' gap={24} style={{ height: '100%' }}>
           <Sensors />

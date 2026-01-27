@@ -1,7 +1,7 @@
 .chat {
   position: relative;
   background: transparent;
-  height: calc(100% - 110px);
+  height: calc(100% - 136px - 24px);
 }
 
 .body {

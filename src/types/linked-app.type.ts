@@ -19,7 +19,7 @@ export interface TirggerCondition {
   device_type: string;
   property: string;
   operator: string;
-  value: number;
+  value: string;
 }
 
 export interface ExecutionAction {

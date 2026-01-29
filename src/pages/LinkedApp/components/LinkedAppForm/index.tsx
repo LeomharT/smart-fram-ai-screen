@@ -15,7 +15,6 @@ import {
   Divider,
   Form,
   Input,
-  InputNumber,
   Modal,
   Select,
   Space,
@@ -210,11 +209,7 @@ export default function LinkedAppForm(props: LinkedAppFormProps) {
                             layout='vertical'
                             label='触发值'
                           >
-                            <InputNumber
-                              placeholder='请输入触发值'
-                              controls={false}
-                              style={{ width: '100%' }}
-                            />
+                            <Input placeholder='请输入触发值' />
                           </Form.Item>
                         </div>
                       </Card>

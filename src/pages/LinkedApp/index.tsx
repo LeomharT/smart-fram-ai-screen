@@ -140,7 +140,7 @@ export default function LinkedApp() {
       dataIndex: '',
       render(_, record) {
         return (
-          <Space>
+          <Space size={0}>
             <Button
               className={classes.action}
               size='large'

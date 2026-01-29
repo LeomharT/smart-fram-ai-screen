@@ -48,14 +48,37 @@
 
 .content {
   height: calc(100% - 40px - 180px);
-  padding-top: 32px;
+  padding-block: 16px;
   justify-content: space-between;
   gap: 48px;
+}
+
+.report {
+  height: 100%;
+  overflow: auto;
+  display: flex;
+  flex-flow: column nowrap;
+  gap: 12px;
 }
 
 .history {
   height: 180px;
   width: 100%;
+  display: flex;
+  flex-flow: row nowrap;
+  gap: 12px;
+  align-items: center;
   overflow: auto;
   background: transparent;
+  border: 1px solid #ffffff;
+  border-radius: 8px;
+  scrollbar-width: none;
+}
+
+.item {
+  cursor: pointer;
+  justify-content: space-between;
+  min-width: 'max-content';
+  background: #005c25;
+  flex-shrink: 0;
 }

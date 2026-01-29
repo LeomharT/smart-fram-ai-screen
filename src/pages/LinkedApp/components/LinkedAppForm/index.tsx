@@ -112,6 +112,9 @@ export default function LinkedAppForm(props: LinkedAppFormProps) {
     <Modal
       {...props}
       title='联动应用'
+      styles={{
+        wrapper: { scrollbarWidth: 'none' },
+      }}
       width='45%'
       onOk={form.submit}
       afterClose={form.resetFields}

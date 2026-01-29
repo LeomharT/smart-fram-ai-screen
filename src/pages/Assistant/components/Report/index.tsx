@@ -44,7 +44,7 @@ export default function Report() {
             ) : (
               <Flex vertical className={classes.text}>
                 <Typography.Title>农事报告</Typography.Title>
-                <Flex justify='center'>
+                <Flex>
                   <Typography.Title level={2} style={{ margin: 0 }}>
                     时间:
                     {formater.format(new Date(selected?.createdAt ?? 0))}

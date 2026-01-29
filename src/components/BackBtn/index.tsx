@@ -1,10 +1,24 @@
 import { useNavigate } from 'react-router';
 import classes from './style.module.css';
-export default function BackBtn() {
+
+type BackBtnProps = {
+  onBack?: () => void;
+};
+
+export default function BackBtn(props: BackBtnProps) {
   const navigate = useNavigate();
 
   return (
-    <div className={classes.btn} onClick={() => navigate('/')}>
+    <div
+      className={classes.btn}
+      onClick={() => {
+        if (props.onBack) {
+          props.onBack();
+        } else {
+          navigate('/');
+        }
+      }}
+    >
       <BackSVG />
     </div>
   );

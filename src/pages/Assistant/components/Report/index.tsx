@@ -1,5 +1,4 @@
 import { getReportList } from '@/api/assistant.api';
-import BackBtn from '@/components/BackBtn';
 import TransparentCard from '@/components/TransparentCard';
 import { QUERIES } from '@/constant/queries';
 import type { ReportContent } from '@/types/assistant.type';
@@ -32,7 +31,6 @@ export default function Report() {
 
   return (
     <div className={classes.report}>
-      <BackBtn />
       <TransparentCard
         style={{ height: '100%' }}
         styles={{ body: { height: '100%' } }}

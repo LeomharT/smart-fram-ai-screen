@@ -7,7 +7,6 @@ import {
   Sender,
   type BubbleItemType,
   type BubbleListProps,
-  type BubbleProps,
 } from '@ant-design/x';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import {
@@ -18,7 +17,6 @@ import {
   Input,
   Modal,
   Space,
-  Typography,
   type GetRef,
 } from 'antd';
 import { Avatar } from 'antd/lib';
@@ -31,10 +29,10 @@ import Lame from 'lamejs/src/js/Lame';
 //@ts-ignore
 import { QUERIES } from '@/constant/queries';
 import { EyeOutlined, InboxOutlined, PlusOutlined } from '@ant-design/icons';
-import XMarkdown from '@ant-design/x-markdown';
 //@ts-ignore
 import MPEGMode from 'lamejs/src/js/MPEGMode';
 import { useEffect, useRef, useState } from 'react';
+import { genItem } from '../../genItem';
 import classes from './style.module.css';
 import ai from '/assets/imgs/icons/ai.svg?url';
 
@@ -45,41 +43,13 @@ window.Lame = Lame;
 //@ts-ignore
 window.BitStream = BitStream;
 
-const renderMarkdown: BubbleProps['contentRender'] = (content) => {
-  return (
-    <Typography>
-      <XMarkdown content={content} />
-    </Typography>
-  );
+type ChatProps = {
+  onCheckReport: () => void;
+  items: BubbleItemType[];
+  setItems: React.Dispatch<React.SetStateAction<BubbleItemType[]>>;
 };
 
-const genItem = (
-  isAI: boolean,
-  content: string,
-  config?: Partial<BubbleItemType>,
-) => {
-  return {
-    key: config?.key ?? '',
-    role: isAI ? 'ai' : 'user',
-    content: content,
-    styles: {
-      content: {
-        background: isAI ? '#ffffff' : '#00b96b',
-      },
-    },
-    contentRender: (...args) =>
-      isAI ? (
-        renderMarkdown(...args)
-      ) : (
-        <Typography style={{ color: '#fff' }}>{content}</Typography>
-      ),
-    ...config,
-  } as BubbleListProps['items'][number] & {
-    audioChunks: string[];
-  };
-};
-
-export default function Chat() {
+export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
   const { message } = App.useApp();
 
   const [form] = Form.useForm();
@@ -107,15 +77,7 @@ export default function Chat() {
   const sourceBufferRef = useRef<SourceBuffer | null>(null);
   const queueRef = useRef<Uint8Array[]>([]);
 
-  const [playing, setPlaying] = useState(true);
-
-  const [items, setItems] = useState<BubbleItemType[]>([
-    genItem(
-      true,
-      '您好, 我是新大陆农业大模型AI助手, 可以帮您解答农业问题, 分析作物状况并生成农事报告',
-      { typing: false, key: 'init' },
-    ),
-  ]);
+  const [playing, setPlaying] = useState(false);
 
   const memoRole: BubbleListProps['role'] = {
     ai: {
@@ -505,6 +467,11 @@ export default function Chat() {
           color='primary'
           shape='round'
           icon={<EyeOutlined />}
+          onClick={() => {
+            cancelMutation();
+            resetAudioEngine();
+            onCheckReport();
+          }}
         >
           查看农事报告
         </Button>
@@ -557,6 +524,7 @@ export default function Chat() {
           onCancel={() => {
             cancelMutation();
             resetAudioEngine();
+            setPlaying(false);
           }}
         />
       </div>

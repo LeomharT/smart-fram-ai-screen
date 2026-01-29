@@ -9,8 +9,10 @@
   height: 100%;
   overflow: auto;
   background: #e8efeb;
+}
 
-  scrollbar-width: none;
+.content::-webkit-scrollbar {
+  width: 0;
 }
 
 .history {

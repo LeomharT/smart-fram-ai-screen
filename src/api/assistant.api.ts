@@ -36,3 +36,15 @@ export async function spechToText(audio: File) {
 
   return res?.data;
 }
+
+export async function getTips() {
+  const res = await fetchData<string>(APIS.ASSISTANT.TIPS);
+  return res?.data;
+}
+
+export async function putTip(data: { tip: string }) {
+  return fetchData(APIS.ASSISTANT.TIPS, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+}

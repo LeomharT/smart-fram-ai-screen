@@ -1,17 +1,26 @@
-import { postReport, spechToText } from '@/api/assistant.api';
+import { getTips, postReport, putTip, spechToText } from '@/api/assistant.api';
 import { APIS } from '@/constant/host';
 import { MUTATIONS } from '@/constant/mutations';
 import type { ChatData, ChatResponse } from '@/types/assistant.type';
 import {
-  Actions,
   Bubble,
   Sender,
   type BubbleItemType,
   type BubbleListProps,
   type BubbleProps,
 } from '@ant-design/x';
-import { useMutation } from '@tanstack/react-query';
-import { App, Button, Space, Typography, type GetRef } from 'antd';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import {
+  App,
+  Button,
+  Flex,
+  Form,
+  Input,
+  Modal,
+  Space,
+  Typography,
+  type GetRef,
+} from 'antd';
 import { Avatar } from 'antd/lib';
 //@ts-ignore
 import lamejs from 'lamejs';
@@ -20,7 +29,13 @@ import BitStream from 'lamejs/src/js/BitStream';
 //@ts-ignore
 import Lame from 'lamejs/src/js/Lame';
 //@ts-ignore
-import { EyeOutlined, InboxOutlined, SoundOutlined } from '@ant-design/icons';
+import { QUERIES } from '@/constant/queries';
+import {
+  EyeOutlined,
+  InboxOutlined,
+  PlusOutlined,
+  SoundOutlined,
+} from '@ant-design/icons';
 import XMarkdown from '@ant-design/x-markdown';
 //@ts-ignore
 import MPEGMode from 'lamejs/src/js/MPEGMode';
@@ -42,14 +57,6 @@ const renderMarkdown: BubbleProps['contentRender'] = (content) => {
     </Typography>
   );
 };
-
-const actionItems = [
-  {
-    key: 'sound',
-    icon: <SoundOutlined style={{ fontSize: 16, color: '#fff' }} />,
-    label: '语音播放',
-  },
-];
 
 const genItem = (
   isAI: boolean,
@@ -80,6 +87,10 @@ const genItem = (
 export default function Chat() {
   const { message } = App.useApp();
 
+  const [form] = Form.useForm();
+
+  const [open, setOpen] = useState(false);
+
   const listRef = useRef<GetRef<typeof Bubble.List>>(null);
 
   const senderRef = useRef<GetRef<typeof Sender>>(null);
@@ -96,13 +107,12 @@ export default function Chat() {
   const mediaSourceRef = useRef<MediaSource | null>(null);
   const urlRef = useRef<string>('');
 
+  const aiAudioChunk = useRef<Record<string, string[]>>({});
   const ttsChunkRef = useRef<string[]>([]);
   const sourceBufferRef = useRef<SourceBuffer | null>(null);
   const queueRef = useRef<Uint8Array[]>([]);
 
-  const [items, setItems] = useState<
-    (BubbleItemType & { audioChunks: string[] })[]
-  >([
+  const [items, setItems] = useState<BubbleItemType[]>([
     genItem(
       true,
       '您好, 我是新大陆农业大模型AI助手, 可以帮您解答农业问题, 分析作物状况并生成农事报告',
@@ -115,27 +125,32 @@ export default function Chat() {
       typing: true,
       avatar: () => <Avatar src={ai} />,
       footer: (_, { key }) => {
-        return null;
+        if (key === 'init') return;
         return (
-          <Actions
-            items={actionItems}
+          <Button
+            type='text'
+            size='large'
+            className={classes.action}
+            icon={<SoundOutlined />}
             onClick={async () => {
-              const item = items.filter((item) => item.key === key)[0];
-              if (item) {
-                const byteArrays = item.audioChunks.map(
-                  (base64) => new Uint8Array(base64ToArrayBuffer(base64)),
-                );
+              if (!key) return;
 
-                const combinedBlob = new Blob(byteArrays, {
-                  type: 'audio/mp3',
-                });
+              const chunk = aiAudioChunk.current[key];
+              if (!chunk) return;
 
-                const url = URL.createObjectURL(combinedBlob);
-                const audio = new Audio(url);
-                audio.play();
+              const byteArrays = chunk.map(
+                (base64) => new Uint8Array(base64ToArrayBuffer(base64)),
+              );
 
-                audio.onended = () => URL.revokeObjectURL(url);
-              }
+              const combinedBlob = new Blob(byteArrays, {
+                type: 'audio/mp3',
+              });
+
+              const url = URL.createObjectURL(combinedBlob);
+              const audio = new Audio(url);
+              audio.play();
+
+              audio.onended = () => URL.revokeObjectURL(url);
             }}
           />
         );
@@ -146,6 +161,11 @@ export default function Chat() {
       typing: true,
     },
   };
+
+  const query = useQuery({
+    queryKey: [QUERIES.ASSISTANT.TIPS],
+    queryFn: getTips,
+  });
 
   const mutation = useMutation({
     mutationKey: [MUTATIONS.ASSISTANT.CHAT],
@@ -173,8 +193,12 @@ export default function Chat() {
         source.onmessage = (ev) => {
           const data: ChatResponse = JSON.parse(ev.data);
 
-          if (data.event === 'message') updateLastAIChatContent(data.answer);
+          if (data.event === 'message') {
+            updateLastAIChatContent(data.answer);
+          }
           if (data.event === 'tts_message') {
+            updateLastAIChatAudioChunk(data.audio);
+
             const buffer = new Uint8Array(base64ToArrayBuffer(data.audio));
             queueRef.current.push(buffer);
 
@@ -184,7 +208,6 @@ export default function Chat() {
               processQueue();
             }
           }
-
           if (data.event === 'tts_message_end') {
             if (mediaSourceRef.current?.readyState === 'open') {
               mediaSourceRef.current.endOfStream();
@@ -222,6 +245,16 @@ export default function Chat() {
     },
   });
 
+  const tipMutation = useMutation({
+    mutationKey: [MUTATIONS.ASSISTANT.TIP],
+    mutationFn: putTip,
+    onSuccess() {
+      message.success('提示词添加成功');
+      query.refetch();
+      setOpen(false);
+    },
+  });
+
   function sendMessage(message: string) {
     setItems((prev) => {
       return [
@@ -244,7 +277,7 @@ export default function Chat() {
     mutation.mutate({ query: message });
   }
 
-  const updateLastAIChatContent = (content: string) => {
+  function updateLastAIChatContent(content: string) {
     setItems((prev) => {
       const lastItem = prev[prev.length - 1];
       if (lastItem && lastItem.role === 'ai') {
@@ -258,7 +291,22 @@ export default function Chat() {
       }
       return prev;
     });
-  };
+  }
+
+  function updateLastAIChatAudioChunk(content: string) {
+    const lastItem = items[items.length - 1];
+
+    if (lastItem && lastItem.role === 'ai') {
+      if (!aiAudioChunk.current[lastItem.key]) {
+        aiAudioChunk.current[lastItem.key] = [];
+      }
+
+      aiAudioChunk.current[lastItem.key] = [
+        ...aiAudioChunk.current[lastItem.key],
+        content,
+      ];
+    }
+  }
 
   async function handleOnRecord(recording: boolean) {
     setRecording(recording);
@@ -429,6 +477,29 @@ export default function Chat() {
 
   return (
     <div className={classes.chat}>
+      <Modal
+        title='添加提示词'
+        open={open}
+        okButtonProps={{ size: 'large' }}
+        cancelButtonProps={{ size: 'large' }}
+        onCancel={() => {
+          setOpen(false);
+          form.resetFields();
+        }}
+        confirmLoading={mutation.isPending}
+        onOk={() => form.submit()}
+      >
+        <Form form={form} size='large' onFinish={tipMutation.mutate}>
+          <Form.Item
+            required
+            name='tips'
+            label='提示词'
+            rules={[{ required: true }]}
+          >
+            <Input.TextArea rows={3} placeholder='请输入提示词' />
+          </Form.Item>
+        </Form>
+      </Modal>
       <Space className={classes.btns} vertical>
         <Button
           size='large'
@@ -459,6 +530,30 @@ export default function Chat() {
         autoScroll
       />
       <div className={classes.sender}>
+        <Flex wrap gap={12} style={{ marginBottom: 12 }}>
+          {query.data?.split(';').map((value, index) => (
+            <Button
+              key={index}
+              onClick={() => {
+                senderRef.current?.clear();
+                setTimeout(() => {
+                  senderRef.current?.insert(value);
+                });
+              }}
+            >
+              {value}
+            </Button>
+          ))}
+          <Button
+            icon={<PlusOutlined />}
+            onClick={() => {
+              setOpen(true);
+              form.setFieldValue('tips', query.data);
+            }}
+          >
+            添加常用语
+          </Button>
+        </Flex>
         <Sender
           ref={senderRef}
           classNames={{

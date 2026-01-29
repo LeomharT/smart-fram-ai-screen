@@ -24,5 +24,6 @@ export const MUTATIONS = {
     CHAT: 'CHAT',
     REPORT: 'REPORT',
     STT: 'STT',
+    TIP: 'TIP',
   },
 };

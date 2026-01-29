@@ -2,7 +2,8 @@ import { getSensorData } from '@/api/assistant.api';
 import Loader from '@/components/Loader';
 import { QUERIES } from '@/constant/queries';
 import { useQuery } from '@tanstack/react-query';
-import { Card, Flex, Image, Space, Typography } from 'antd';
+import { Image, Space, Typography } from 'antd';
+import classes from './style.module.css';
 import co2 from '/assets/imgs/icons/co2.svg?url';
 import pm25 from '/assets/imgs/icons/PM2.5.svg?url';
 import tvoc from '/assets/imgs/icons/tvoc.svg?url';
@@ -72,10 +73,13 @@ export default function Sensors() {
   ];
 
   return (
-    <Loader spinning={query.isFetching}>
-      <Flex wrap='nowrap' justify='space-between' gap={16}>
+    <Loader
+      spinning={query.isFetching}
+      classNames={{ wrapper: classes.loader }}
+    >
+      <div className={classes.list}>
         {items.map((i) => (
-          <Card key={i.key} style={{ background: 'transparent', flex: 1 }}>
+          <div key={i.key} className={classes.item}>
             <Space>
               <Image preview={false} src={i.icon} />
               <Space orientation='vertical' size={0}>
@@ -90,9 +94,9 @@ export default function Sensors() {
                 </Typography.Text>
               </Space>
             </Space>
-          </Card>
+          </div>
         ))}
-      </Flex>
+      </div>
     </Loader>
   );
 }

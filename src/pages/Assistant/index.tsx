@@ -1,6 +1,5 @@
 import BackBtn from '@/components/BackBtn';
 import TransparentCard from '@/components/TransparentCard';
-import { Flex } from 'antd';
 import Chat from './components/Chat';
 import Sensors from './components/Sensors';
 import classes from './style.module.css';
@@ -8,15 +7,15 @@ import classes from './style.module.css';
 export default function Assistant() {
   return (
     <div className={classes.assistant}>
-      <BackBtn />
       <TransparentCard
         style={{ height: '100%' }}
-        styles={{ body: { height: 'calc(100%)' } }}
+        styles={{ body: { height: '100%', padding: 12 } }}
       >
-        <Flex orientation='vertical' gap={24} style={{ height: '100%' }}>
-          <Sensors />
+        <BackBtn />
+        <div className={classes.wrap}>
           <Chat />
-        </Flex>
+          <Sensors />
+        </div>
       </TransparentCard>
     </div>
   );

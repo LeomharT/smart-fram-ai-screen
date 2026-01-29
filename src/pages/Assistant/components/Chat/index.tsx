@@ -8,9 +8,10 @@ import {
   Sender,
   type BubbleItemType,
   type BubbleListProps,
+  type BubbleProps,
 } from '@ant-design/x';
 import { useMutation } from '@tanstack/react-query';
-import { App, Button, Card, Space, type GetRef } from 'antd';
+import { App, Button, Card, Space, Typography, type GetRef } from 'antd';
 import { Avatar } from 'antd/lib';
 //@ts-ignore
 import lamejs from 'lamejs';
@@ -19,11 +20,11 @@ import BitStream from 'lamejs/src/js/BitStream';
 //@ts-ignore
 import Lame from 'lamejs/src/js/Lame';
 //@ts-ignore
-import { SoundOutlined } from '@ant-design/icons';
+import { EyeOutlined, InboxOutlined, SoundOutlined } from '@ant-design/icons';
+import XMarkdown from '@ant-design/x-markdown';
 //@ts-ignore
 import MPEGMode from 'lamejs/src/js/MPEGMode';
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router';
 import classes from './style.module.css';
 import ai from '/assets/imgs/icons/ai.svg?url';
 
@@ -33,6 +34,14 @@ window.MPEGMode = MPEGMode;
 window.Lame = Lame;
 //@ts-ignore
 window.BitStream = BitStream;
+
+const renderMarkdown: BubbleProps['contentRender'] = (content) => {
+  return (
+    <Typography>
+      <XMarkdown content={content} />
+    </Typography>
+  );
+};
 
 const actionItems = [
   {
@@ -54,9 +63,14 @@ const genItem = (
     styles: {
       content: {
         background: isAI ? '#ffffff' : '#00b96b',
-        color: isAI ? '#000' : '#fff',
       },
     },
+    contentRender: (...args) =>
+      isAI ? (
+        renderMarkdown(...args)
+      ) : (
+        <Typography style={{ color: '#fff' }}>{content}</Typography>
+      ),
     ...config,
   } as BubbleListProps['items'][number] & {
     audioChunks: string[];
@@ -65,8 +79,6 @@ const genItem = (
 
 export default function Chat() {
   const { message } = App.useApp();
-
-  const navigate = useNavigate();
 
   const listRef = useRef<GetRef<typeof Bubble.List>>(null);
 
@@ -194,10 +206,10 @@ export default function Chat() {
     mutationFn: spechToText,
     onSuccess(data?: string) {
       console.log(data);
-      senderRef.current?.insert(data as string);
+      if (data) senderRef.current?.insert(data);
     },
     onError(err) {
-      message.error(err.message);
+      console.log(err);
       setRecording(false);
     },
   });
@@ -416,24 +428,25 @@ export default function Chat() {
   }, []);
 
   return (
-    <Card className={classes.chat} styles={{ body: { height: '100%' } }}>
+    <div className={classes.chat}>
       <Space className={classes.btns} vertical>
         <Button
-          type='primary'
+          size='large'
           shape='round'
-          onClick={() => reportMutation.mutate()}
+          type='primary'
           loading={reportMutation.isPending}
+          onClick={() => reportMutation.mutate()}
+          icon={<InboxOutlined />}
         >
           一键生成农事报告
         </Button>
         <Button
-          variant='link'
-          color='primary'
           block
+          size='large'
+          variant='filled'
+          color='primary'
           shape='round'
-          onClick={() => {
-            navigate('report');
-          }}
+          icon={<EyeOutlined />}
         >
           查看农事报告
         </Button>
@@ -445,18 +458,18 @@ export default function Chat() {
         autoScroll
         style={{
           height: 'calc(100% - 101px)',
-          maxWidth: 760,
-          margin: '0 auto',
+          maxWidth: 'calc(100% - 220px)',
         }}
       />
       <Card
-        style={{ maxWidth: 760, margin: '0 auto' }}
+        style={{ maxWidth: 'calc(100% - 220px)' }}
         styles={{ body: { padding: 0 } }}
       >
         <Sender
           ref={senderRef}
           classNames={{
             suffix: classes.suffix,
+            input: classes.input,
           }}
           allowSpeech={{
             onRecordingChange: handleOnRecord,
@@ -471,7 +484,7 @@ export default function Chat() {
           }}
         />
       </Card>
-    </Card>
+    </div>
   );
 }
 

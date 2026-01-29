@@ -11,7 +11,7 @@ import {
   type BubbleProps,
 } from '@ant-design/x';
 import { useMutation } from '@tanstack/react-query';
-import { App, Button, Card, Space, Typography, type GetRef } from 'antd';
+import { App, Button, Space, Typography, type GetRef } from 'antd';
 import { Avatar } from 'antd/lib';
 //@ts-ignore
 import lamejs from 'lamejs';
@@ -452,19 +452,13 @@ export default function Chat() {
         </Button>
       </Space>
       <Bubble.List
+        className={classes.bubbles}
         ref={listRef}
         items={items}
         role={memoRole}
         autoScroll
-        style={{
-          height: 'calc(100% - 101px)',
-          maxWidth: 'calc(100% - 220px)',
-        }}
       />
-      <Card
-        style={{ maxWidth: 'calc(100% - 220px)' }}
-        styles={{ body: { padding: 0 } }}
-      >
+      <div className={classes.sender}>
         <Sender
           ref={senderRef}
           classNames={{
@@ -483,7 +477,7 @@ export default function Chat() {
             resetAudioEngine();
           }}
         />
-      </Card>
+      </div>
     </div>
   );
 }

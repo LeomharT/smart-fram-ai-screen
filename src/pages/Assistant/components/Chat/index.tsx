@@ -30,12 +30,7 @@ import BitStream from 'lamejs/src/js/BitStream';
 import Lame from 'lamejs/src/js/Lame';
 //@ts-ignore
 import { QUERIES } from '@/constant/queries';
-import {
-  EyeOutlined,
-  InboxOutlined,
-  PlusOutlined,
-  SoundOutlined,
-} from '@ant-design/icons';
+import { EyeOutlined, InboxOutlined, PlusOutlined } from '@ant-design/icons';
 import XMarkdown from '@ant-design/x-markdown';
 //@ts-ignore
 import MPEGMode from 'lamejs/src/js/MPEGMode';
@@ -112,6 +107,8 @@ export default function Chat() {
   const sourceBufferRef = useRef<SourceBuffer | null>(null);
   const queueRef = useRef<Uint8Array[]>([]);
 
+  const [playing, setPlaying] = useState(true);
+
   const [items, setItems] = useState<BubbleItemType[]>([
     genItem(
       true,
@@ -126,14 +123,18 @@ export default function Chat() {
       avatar: () => <Avatar src={ai} />,
       footer: (_, { key }) => {
         if (key === 'init') return;
+        if (key !== items.length - 1) return;
+        if (!playing) return;
         return (
           <Button
             type='text'
             size='large'
             className={classes.action}
-            icon={<SoundOutlined />}
+            icon={<LoadingSVG />}
             onClick={async () => {
-              if (!key) return;
+              cancelMutation();
+              resetAudioEngine();
+              setPlaying(false);
 
               const chunk = aiAudioChunk.current[key];
               if (!chunk) return;
@@ -181,6 +182,8 @@ export default function Chat() {
       ttsChunkRef.current = [];
       eventSourceRef.current?.close();
 
+      setPlaying(true);
+
       return new Promise((resolve, reject) => {
         const search = new URLSearchParams(
           data as unknown as Record<string, string>,
@@ -197,8 +200,6 @@ export default function Chat() {
             updateLastAIChatContent(data.answer);
           }
           if (data.event === 'tts_message') {
-            updateLastAIChatAudioChunk(data.audio);
-
             const buffer = new Uint8Array(base64ToArrayBuffer(data.audio));
             queueRef.current.push(buffer);
 
@@ -213,6 +214,7 @@ export default function Chat() {
               mediaSourceRef.current.endOfStream();
             }
             source.close();
+            setPlaying(false);
             resolve('success');
           }
         };
@@ -291,21 +293,6 @@ export default function Chat() {
       }
       return prev;
     });
-  }
-
-  function updateLastAIChatAudioChunk(content: string) {
-    const lastItem = items[items.length - 1];
-
-    if (lastItem && lastItem.role === 'ai') {
-      if (!aiAudioChunk.current[lastItem.key]) {
-        aiAudioChunk.current[lastItem.key] = [];
-      }
-
-      aiAudioChunk.current[lastItem.key] = [
-        ...aiAudioChunk.current[lastItem.key],
-        content,
-      ];
-    }
   }
 
   async function handleOnRecord(recording: boolean) {
@@ -585,3 +572,52 @@ const base64ToArrayBuffer = (base64: string) => {
   }
   return bytes.buffer;
 };
+
+function LoadingSVG() {
+  return (
+    <svg
+      color='currentColor'
+      viewBox='0 0 1000 1000'
+      xmlns='http://www.w3.org/2000/svg'
+      className={classes.loading}
+    >
+      <title>Stop loading</title>
+      <rect
+        fill='currentColor'
+        height='250'
+        rx='24'
+        ry='24'
+        width='250'
+        x='375'
+        y='375'
+      ></rect>
+      <circle
+        cx='500'
+        cy='500'
+        fill='none'
+        r='450'
+        stroke='currentColor'
+        strokeWidth='100'
+        opacity='0.45'
+      ></circle>
+      <circle
+        cx='500'
+        cy='500'
+        fill='none'
+        r='450'
+        stroke='currentColor'
+        strokeWidth='100'
+        strokeDasharray='600 9999999'
+      >
+        <animateTransform
+          attributeName='transform'
+          dur='1s'
+          from='0 500 500'
+          repeatCount='indefinite'
+          to='360 500 500'
+          type='rotate'
+        ></animateTransform>
+      </circle>
+    </svg>
+  );
+}

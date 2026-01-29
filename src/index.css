@@ -6,6 +6,10 @@
   src: url('/assets/fonts/Alimama_ShuHeiTi_Bold.ttf') format('truetype');
 }
 
+html {
+  touch-action: manipulation;
+}
+
 #nprogress .bar {
   background: #95de64;
 }

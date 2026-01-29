@@ -99,7 +99,6 @@ export default function NetworkConfig() {
             >
               <Form.Item label='IP地址' required>
                 <Space.Compact style={{ width: '100%' }}>
-                  <Space.Addon>mqtt://</Space.Addon>
                   <Form.Item name='ipAddr' rules={[{ required: true }]} noStyle>
                     <Input />
                   </Form.Item>

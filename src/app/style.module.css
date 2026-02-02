@@ -24,6 +24,7 @@
   flex-flow: row nowrap;
   align-items: center;
   padding-inline: 36px;
+  justify-content: space-between;
 
   & h1 {
     font-family: 'Alimama_ShuHeiTi_Bold';

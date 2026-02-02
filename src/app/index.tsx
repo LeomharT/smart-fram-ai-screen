@@ -1,3 +1,4 @@
+import CurrTime from '@/components/CurrTime';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Alert, App, ConfigProvider, Image, Space, theme } from 'antd';
@@ -48,6 +49,7 @@ export default function AppShell() {
                   )}
                   <h1>{(match.at(-1)?.handle as { title?: string })?.title}</h1>
                 </Space>
+                <CurrTime />
               </header>
               <main className={classes.main}>
                 <Suspense fallback={<Fallback />}>

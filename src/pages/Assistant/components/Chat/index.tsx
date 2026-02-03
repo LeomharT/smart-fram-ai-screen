@@ -49,6 +49,8 @@ type ChatProps = {
   setItems: React.Dispatch<React.SetStateAction<BubbleItemType[]>>;
 };
 
+const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
 export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
   const { message } = App.useApp();
 
@@ -78,6 +80,8 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
   const queueRef = useRef<Uint8Array[]>([]);
 
   const [playing, setPlaying] = useState(false);
+
+  const [isFocuse, setFocuse] = useState(false);
 
   const memoRole: BubbleListProps['role'] = {
     ai: {
@@ -483,7 +487,12 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
         role={memoRole}
         autoScroll
       />
-      <div className={classes.sender}>
+      <div
+        className={classes.sender}
+        style={{
+          paddingBottom: isFocuse && isTouch ? 260 : 0,
+        }}
+      >
         <Flex wrap gap={12} style={{ marginBottom: 12 }}>
           {query.data?.split(';').map((value, index) => (
             <Button
@@ -521,6 +530,8 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
           autoSize={{ minRows: 3, maxRows: 3 }}
           loading={mutation.isPending}
           onSubmit={sendMessage}
+          onFocus={() => setFocuse(true)}
+          onBlur={() => setFocuse(false)}
           onCancel={() => {
             cancelMutation();
             resetAudioEngine();

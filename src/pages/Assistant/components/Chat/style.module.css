@@ -18,6 +18,7 @@
   width: 100%;
   flex: 0 0 auto;
   max-width: calc(100% - 220px);
+  transition: padding 0.2s ease;
 
   & :global(.ant-sender) {
     border: none;

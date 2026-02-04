@@ -159,75 +159,85 @@ export default function LinkedAppForm(props: LinkedAppFormProps) {
               <>
                 <div className={classes.section} hidden={!field.length}>
                   {field.map(({ key, name }) => (
-                    <Space key={key} align='start' wrap={false}>
-                      <Card styles={{ body: { paddingBottom: 36 } }}>
-                        <Form.Item
-                          name={[name, 'device_type']}
-                          label='触发设备'
-                          rules={[{ required: true }]}
-                        >
-                          <Select
-                            placeholder='请选择设备'
-                            options={query.data?.sensor_type}
-                            onChange={() => onDeviceChange(name)}
-                          />
-                        </Form.Item>
-                        <div className={classes.grid}>
+                    <div key={key}>
+                      <Space align='start' wrap={false}>
+                        <Card styles={{ body: { paddingBottom: 36 } }}>
                           <Form.Item
-                            noStyle
-                            dependencies={[
-                              ['triggerCondition', name, 'device_type'],
-                            ]}
-                          >
-                            {() => {
-                              return (
-                                <Form.Item
-                                  name={[name, 'property']}
-                                  rules={[{ required: true }]}
-                                  layout='vertical'
-                                  label='属性'
-                                >
-                                  <Select
-                                    placeholder='请选择设备属性'
-                                    options={getDeviceProps(name)}
-                                  />
-                                </Form.Item>
-                              );
-                            }}
-                          </Form.Item>
-                          <Form.Item
-                            name={[name, 'operator']}
+                            name={[name, 'device_type']}
+                            label='触发设备'
                             rules={[{ required: true }]}
-                            layout='vertical'
-                            label='条件'
                           >
                             <Select
-                              placeholder='请选择条件'
-                              options={query.data?.ld_operator}
+                              placeholder='请选择设备'
+                              options={query.data?.sensor_type}
+                              onChange={() => onDeviceChange(name)}
                             />
                           </Form.Item>
-                          <Form.Item
-                            name={[name, 'value']}
-                            rules={[{ required: true }]}
-                            layout='vertical'
-                            label='触发值'
-                          >
-                            <Input placeholder='请输入触发值' />
-                          </Form.Item>
-                        </div>
-                      </Card>
-                      <Button
-                        type='text'
-                        icon={<MinusCircleOutlined />}
-                        onClick={() => {
-                          if (field.length === 1) {
-                            message.warning('请保留至少一条触发器规则');
-                          } else {
-                            remove(name);
-                          }
-                        }}
-                      />
-                    </Space>
+                          <div className={classes.grid}>
+                            <Form.Item
+                              noStyle
+                              dependencies={[
+                                ['triggerCondition', name, 'device_type'],
+                              ]}
+                            >
+                              {() => {
+                                return (
+                                  <Form.Item
+                                    name={[name, 'property']}
+                                    rules={[{ required: true }]}
+                                    layout='vertical'
+                                    label='属性'
+                                  >
+                                    <Select
+                                      placeholder='请选择设备属性'
+                                      options={getDeviceProps(name)}
+                                    />
+                                  </Form.Item>
+                                );
+                              }}
+                            </Form.Item>
+                            <Form.Item
+                              name={[name, 'operator']}
+                              rules={[{ required: true }]}
+                              layout='vertical'
+                              label='条件'
+                            >
+                              <Select
+                                placeholder='请选择条件'
+                                options={query.data?.ld_operator}
+                              />
+                            </Form.Item>
+                            <Form.Item
+                              name={[name, 'value']}
+                              rules={[{ required: true }]}
+                              layout='vertical'
+                              label='触发值'
+                            >
+                              <Input placeholder='请输入触发值' />
+                            </Form.Item>
+                          </div>
+                        </Card>
+                        <Button
+                          type='text'
+                          icon={<MinusCircleOutlined />}
+                          onClick={() => {
+                            if (field.length === 1) {
+                              message.warning('请保留至少一条触发器规则');
+                            } else {
+                              remove(name);
+                            }
+                          }}
+                        />
+                      </Space>
+                      {key !== field.length - 1 && (
+                        <Divider
+                          style={{ marginBottom: 0 }}
+                          titlePlacement='start'
+                        >
+                          且
+                        </Divider>
+                      )}
+                    </div>
                   ))}
                 </div>
                 <Button

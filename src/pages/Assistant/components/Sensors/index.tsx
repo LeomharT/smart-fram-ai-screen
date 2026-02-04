@@ -25,6 +25,7 @@ export default function Sensors() {
       温度: { value: 0, unit: '' },
       湿度: { value: 0, unit: '' },
     },
+    refetchInterval: 5000,
   });
 
   const items = [
@@ -73,10 +74,7 @@ export default function Sensors() {
   ];
 
   return (
-    <Loader
-      spinning={query.isFetching}
-      classNames={{ wrapper: classes.loader }}
-    >
+    <Loader spinning={query.isPending} classNames={{ wrapper: classes.loader }}>
       <div className={classes.list}>
         {items.map((i) => (
           <div key={i.key} className={classes.item}>

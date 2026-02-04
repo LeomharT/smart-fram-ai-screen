@@ -240,6 +240,7 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
     mutationFn: postReport,
     onSuccess() {
       message.success('报告生成成功');
+      onCheckReport?.();
     },
   });
 

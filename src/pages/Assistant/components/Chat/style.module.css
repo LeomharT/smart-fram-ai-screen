@@ -56,6 +56,12 @@
 .action {
   font-size: 20px;
   color: #ffff !important;
+
+  & span {
+    height: 100%;
+    display: inline-flex;
+    align-items: center;
+  }
 }
 
 .loading {

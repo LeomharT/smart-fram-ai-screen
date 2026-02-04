@@ -29,6 +29,7 @@ import Lame from 'lamejs/src/js/Lame';
 //@ts-ignore
 import { QUERIES } from '@/constant/queries';
 import { EyeOutlined, InboxOutlined, PlusOutlined } from '@ant-design/icons';
+import { IconVolume, IconVolume3 } from '@tabler/icons-react';
 //@ts-ignore
 import MPEGMode from 'lamejs/src/js/MPEGMode';
 import { useEffect, useRef, useState } from 'react';
@@ -74,13 +75,13 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
   const mediaSourceRef = useRef<MediaSource | null>(null);
   const urlRef = useRef<string>('');
 
-  const aiAudioChunk = useRef<Record<string, string[]>>({});
   const ttsChunkRef = useRef<string[]>([]);
   const sourceBufferRef = useRef<SourceBuffer | null>(null);
   const queueRef = useRef<Uint8Array[]>([]);
+  const audioHistory = useRef<Record<string, string[]>>({});
 
-  const [playing, setPlaying] = useState(false);
-
+  const [isPlaying, setPlaying] = useState(false);
+  const [playingKey, setPlayingKey] = useState<string | number>(0);
   const [isFocuse, setFocuse] = useState(false);
 
   const memoRole: BubbleListProps['role'] = {
@@ -88,39 +89,64 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
       typing: true,
       avatar: () => <Avatar src={ai} />,
       footer: (_, { key }) => {
-        if (key === 'init') return;
-        if (key !== items.length - 1) return;
-        if (!playing) return;
+        if (key === 'init' || !key) return;
         return (
-          <Button
-            type='text'
-            size='large'
-            className={classes.action}
-            icon={<LoadingSVG />}
-            onClick={async () => {
-              // cancelMutation();
-              resetAudioEngine();
-              setPlaying(false);
-              if (audioRef.current) audioRef.current.volume = 0;
+          <Space size={0}>
+            <Button
+              type='text'
+              size='large'
+              hidden={!isPlaying || key !== items.length - 1}
+              className={classes.action}
+              icon={<IconVolume3 />}
+              onClick={async () => {
+                resetAudioEngine();
+                setPlaying(false);
+                if (audioRef.current) audioRef.current.volume = 0;
+              }}
+            />
+            {playingKey === key ? (
+              <Button
+                type='text'
+                size='large'
+                className={classes.action}
+                icon={<IconVolume3 />}
+                onClick={async () => {
+                  resetAudioEngine();
+                  setPlayingKey(0);
+                  if (audioRef.current) audioRef.current.volume = 0;
+                }}
+              />
+            ) : (
+              <Button
+                type='text'
+                size='large'
+                className={classes.action}
+                icon={<IconVolume />}
+                disabled={mutation.isPending}
+                hidden={isPlaying && key === items.length - 1}
+                onClick={() => {
+                  const chunk = audioHistory.current[key.toString()];
+                  const byteArrays = chunk.map(
+                    (base64) => new Uint8Array(base64ToArrayBuffer(base64)),
+                  );
+                  const combinedBlob = new Blob(byteArrays, {
+                    type: 'audio/mp3',
+                  });
 
-              const chunk = aiAudioChunk.current[key];
-              if (!chunk) return;
+                  const url = URL.createObjectURL(combinedBlob);
+                  resetAudioEngine();
+                  audioRef.current = new Audio(url);
+                  audioRef.current.play();
+                  setPlayingKey(key);
 
-              const byteArrays = chunk.map(
-                (base64) => new Uint8Array(base64ToArrayBuffer(base64)),
-              );
-
-              const combinedBlob = new Blob(byteArrays, {
-                type: 'audio/mp3',
-              });
-
-              const url = URL.createObjectURL(combinedBlob);
-              const audio = new Audio(url);
-              audio.play();
-
-              audio.onended = () => URL.revokeObjectURL(url);
-            }}
-          />
+                  audioRef.current.onended = () => {
+                    URL.revokeObjectURL(url);
+                    setPlayingKey(0);
+                  };
+                }}
+              />
+            )}
+          </Space>
         );
       },
     },
@@ -138,18 +164,19 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
   const mutation = useMutation({
     mutationKey: [MUTATIONS.ASSISTANT.CHAT],
     mutationFn: async (data: Partial<ChatData>) => {
+      const key = items.length;
+
       setItems((prev) => {
-        return [
-          ...prev,
-          genItem(true, '', { loading: true, key: items.length }),
-        ];
+        return [...prev, genItem(true, '', { loading: true, key })];
       });
 
       audioRef.current?.pause();
       ttsChunkRef.current = [];
       eventSourceRef.current?.close();
+      audioHistory.current[key.toString()] = [];
 
       setPlaying(true);
+      setPlayingKey(0);
 
       return new Promise((resolve, reject) => {
         const search = new URLSearchParams(
@@ -167,6 +194,8 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
             updateLastAIChatContent(data.answer);
           }
           if (data.event === 'tts_message') {
+            audioHistory.current[key.toString()].push(data.audio);
+
             const buffer = new Uint8Array(base64ToArrayBuffer(data.audio));
             queueRef.current.push(buffer);
 

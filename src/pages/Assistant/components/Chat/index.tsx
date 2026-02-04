@@ -79,8 +79,6 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
   const sourceBufferRef = useRef<SourceBuffer | null>(null);
   const queueRef = useRef<Uint8Array[]>([]);
 
-  const isPlaying = useRef(false);
-
   const [playing, setPlaying] = useState(false);
 
   const [isFocuse, setFocuse] = useState(false);
@@ -103,7 +101,7 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
               // cancelMutation();
               resetAudioEngine();
               setPlaying(false);
-              isPlaying.current = false;
+              if (audioRef.current) audioRef.current.volume = 0;
 
               const chunk = aiAudioChunk.current[key];
               if (!chunk) return;
@@ -152,7 +150,6 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
       eventSourceRef.current?.close();
 
       setPlaying(true);
-      isPlaying.current = true;
 
       return new Promise((resolve, reject) => {
         const search = new URLSearchParams(
@@ -170,8 +167,6 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
             updateLastAIChatContent(data.answer);
           }
           if (data.event === 'tts_message') {
-            if (!isPlaying.current) return;
-
             const buffer = new Uint8Array(base64ToArrayBuffer(data.audio));
             queueRef.current.push(buffer);
 

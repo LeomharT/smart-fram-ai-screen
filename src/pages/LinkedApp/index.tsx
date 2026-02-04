@@ -245,7 +245,15 @@ export default function LinkedApp() {
         onCancel={handleOnClose}
         onSuccess={handleOnSuccess}
       />
-      <TransparentCard style={{ height: '100%' }}>
+      <TransparentCard
+        style={{ height: '100%' }}
+        styles={{
+          body: {
+            height: '100%',
+            overflow: 'auto',
+          },
+        }}
+      >
         <Flex wrap='nowrap' gap={16}>
           <Button
             size='large'

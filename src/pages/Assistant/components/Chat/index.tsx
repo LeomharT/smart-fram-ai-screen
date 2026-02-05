@@ -28,8 +28,13 @@ import BitStream from 'lamejs/src/js/BitStream';
 import Lame from 'lamejs/src/js/Lame';
 //@ts-ignore
 import { QUERIES } from '@/constant/queries';
-import { EyeOutlined, InboxOutlined, PlusOutlined } from '@ant-design/icons';
-import { IconVolume, IconVolume3 } from '@tabler/icons-react';
+import {
+  EyeOutlined,
+  InboxOutlined,
+  MutedOutlined,
+  PlusOutlined,
+  SoundOutlined,
+} from '@ant-design/icons';
 //@ts-ignore
 import MPEGMode from 'lamejs/src/js/MPEGMode';
 import { useEffect, useRef, useState } from 'react';
@@ -97,7 +102,7 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
               size='large'
               hidden={!isPlaying || key !== items.length - 1}
               className={classes.action}
-              icon={<IconVolume3 />}
+              icon={<MutedOutlined />}
               onClick={async () => {
                 resetAudioEngine();
                 setPlaying(false);
@@ -109,7 +114,7 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
                 type='text'
                 size='large'
                 className={classes.action}
-                icon={<IconVolume3 />}
+                icon={<MutedOutlined />}
                 onClick={async () => {
                   resetAudioEngine();
                   setPlayingKey(0);
@@ -121,7 +126,7 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
                 type='text'
                 size='large'
                 className={classes.action}
-                icon={<IconVolume />}
+                icon={<SoundOutlined />}
                 disabled={mutation.isPending}
                 hidden={isPlaying && key === items.length - 1}
                 onClick={() => {

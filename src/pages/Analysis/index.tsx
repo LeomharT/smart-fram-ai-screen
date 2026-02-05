@@ -1,5 +1,4 @@
 import { getAlgorithm, getAnalysisResult } from '@/api/analysis.api';
-import BackBtn from '@/components/BackBtn';
 import Loader from '@/components/Loader';
 import TransparentCard from '@/components/TransparentCard';
 import { QUERIES } from '@/constant/queries';
@@ -65,7 +64,7 @@ export default function Analysis() {
 
   return (
     <div className={classes.analysis}>
-      <BackBtn />
+      {/* <BackBtn /> */}
       <TransparentCard
         loading={result.isPending}
         style={{ height: '100%' }}

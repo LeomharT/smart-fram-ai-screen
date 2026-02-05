@@ -1,11 +1,12 @@
 import CurrTime from '@/components/CurrTime';
+import Analysis from '@/pages/Analysis';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Alert, App, ConfigProvider, Image, Space, theme } from 'antd';
 import zh_CN from 'antd/locale/zh_CN';
 import Nprogress from 'nprogress';
 import { Suspense, useEffect } from 'react';
-import { Outlet, useMatches } from 'react-router';
+import { useMatches } from 'react-router';
 import classes from './style.module.css';
 
 Nprogress.configure({
@@ -54,7 +55,7 @@ export default function AppShell() {
               <main className={classes.main}>
                 <Suspense fallback={<Fallback />}>
                   <Alert.ErrorBoundary>
-                    <Outlet />
+                    <Analysis />
                   </Alert.ErrorBoundary>
                 </Suspense>
               </main>

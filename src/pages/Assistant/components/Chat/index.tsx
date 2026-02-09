@@ -1,7 +1,7 @@
 import { getTips, postReport, putTip, spechToText } from '@/api/assistant.api';
 import { APIS } from '@/constant/host';
 import { MUTATIONS } from '@/constant/mutations';
-import type { ChatData, ChatResponse } from '@/types/assistant.type';
+import type { ChatResponse } from '@/types/assistant.type';
 import {
   Bubble,
   Sender,
@@ -68,6 +68,8 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
 
   const senderRef = useRef<GetRef<typeof Sender>>(null);
 
+  const [isPending, setPending] = useState(false);
+
   const [recording, setRecording] = useState(false);
 
   const eventSourceRef = useRef<EventSource>(null);
@@ -127,7 +129,7 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
                 size='large'
                 className={classes.action}
                 icon={<SoundOutlined />}
-                disabled={mutation.isPending}
+                disabled={isPending}
                 hidden={isPlaying && key === items.length - 1}
                 onClick={() => {
                   const chunk = audioHistory.current[key.toString()];
@@ -166,66 +168,63 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
     queryFn: getTips,
   });
 
-  const mutation = useMutation({
-    mutationKey: [MUTATIONS.ASSISTANT.CHAT],
-    mutationFn: async (data: Partial<ChatData>) => {
-      const key = items.length;
+  function openConnect(message: string) {
+    const key = items.length + 1;
 
-      setItems((prev) => {
-        return [...prev, genItem(true, '', { loading: true, key })];
-      });
+    setItems((prev) => {
+      return [...prev, genItem(true, '', { loading: true, key })];
+    });
 
-      audioRef.current?.pause();
-      ttsChunkRef.current = [];
+    audioRef.current?.pause();
+    ttsChunkRef.current = [];
+    eventSourceRef.current?.close();
+    audioHistory.current[key.toString()] = [];
+
+    setPending(true);
+    setPlaying(true);
+    setPlayingKey(0);
+
+    const search = new URLSearchParams({ query: message });
+
+    eventSourceRef.current = new EventSource(
+      APIS.ASSISTANT.CHAT + `?${search.toString()}`,
+    );
+
+    eventSourceRef.current.onmessage = (ev) => {
+      const data: ChatResponse = JSON.parse(ev.data);
+
+      if (data.event === 'message') {
+        updateLastAIChatContent(data.answer);
+      }
+      if (data.event === 'tts_message') {
+        audioHistory.current[key.toString()].push(data.audio);
+
+        const buffer = new Uint8Array(base64ToArrayBuffer(data.audio));
+        queueRef.current.push(buffer);
+
+        if (queueRef.current.length === 5 && !mediaSourceRef.current) {
+          playAudio();
+        } else {
+          processQueue();
+        }
+      }
+      if (data.event === 'tts_message_end') {
+        if (mediaSourceRef.current?.readyState === 'open') {
+          mediaSourceRef.current.endOfStream();
+        }
+        eventSourceRef.current?.close();
+        setPlaying(false);
+        setPending(false);
+      }
+    };
+
+    eventSourceRef.current.onerror = (ev) => {
+      console.error(ev);
       eventSourceRef.current?.close();
-      audioHistory.current[key.toString()] = [];
-
-      setPlaying(true);
-      setPlayingKey(0);
-
-      return new Promise((resolve, reject) => {
-        const search = new URLSearchParams(
-          data as unknown as Record<string, string>,
-        );
-        const source = new EventSource(
-          APIS.ASSISTANT.CHAT + `?${search.toString()}`,
-        );
-        eventSourceRef.current = source;
-
-        source.onmessage = (ev) => {
-          const data: ChatResponse = JSON.parse(ev.data);
-
-          if (data.event === 'message') {
-            updateLastAIChatContent(data.answer);
-          }
-          if (data.event === 'tts_message') {
-            audioHistory.current[key.toString()].push(data.audio);
-
-            const buffer = new Uint8Array(base64ToArrayBuffer(data.audio));
-            queueRef.current.push(buffer);
-
-            if (queueRef.current.length === 5 && !mediaSourceRef.current) {
-              playAudio();
-            } else {
-              processQueue();
-            }
-          }
-          if (data.event === 'tts_message_end') {
-            if (mediaSourceRef.current?.readyState === 'open') {
-              mediaSourceRef.current.endOfStream();
-            }
-            source.close();
-            setPlaying(false);
-            resolve('success');
-          }
-        };
-
-        source.onerror = (ev) => {
-          reject(ev);
-        };
-      });
-    },
-  });
+      eventSourceRef.current = null;
+      setPending(false);
+    };
+  }
 
   const sttMutation = useMutation({
     mutationKey: [MUTATIONS.ASSISTANT.STT],
@@ -278,7 +277,7 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
     if (!audioRef.current) audioRef.current = new Audio();
     audioRef.current.play().catch(() => {});
 
-    mutation.mutate({ query: message });
+    openConnect(message);
   }
 
   function updateLastAIChatContent(content: string) {
@@ -390,7 +389,6 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
       }
       return prev;
     });
-    mutation.reset();
   };
 
   function playAudio() {
@@ -461,6 +459,7 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
   useEffect(() => {
     return () => {
       audioRef.current?.pause();
+      cancelMutation();
     };
   }, []);
 
@@ -475,7 +474,7 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
           setOpen(false);
           form.resetFields();
         }}
-        confirmLoading={mutation.isPending}
+        confirmLoading={tipMutation.isPending}
         onOk={() => form.submit()}
       >
         <Form form={form} size='large' onFinish={tipMutation.mutate}>
@@ -564,14 +563,15 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
             recording: recording || sttMutation.isPending,
           }}
           autoSize={{ minRows: 3, maxRows: 3 }}
-          loading={mutation.isPending}
-          onSubmit={sendMessage}
+          loading={isPending}
+          onSubmit={(message) => sendMessage(message)}
           onFocus={() => setFocuse(true)}
           onBlur={() => setFocuse(false)}
           onCancel={() => {
             cancelMutation();
             resetAudioEngine();
             setPlaying(false);
+            setPending(false);
           }}
         />
       </div>

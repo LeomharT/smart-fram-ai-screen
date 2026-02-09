@@ -19,6 +19,7 @@ export const MUTATIONS = {
         PUT: 'WEBCAM_PUT',
       },
     },
+    REBOOT: 'REBOOT',
   },
   ASSISTANT: {
     CHAT: 'CHAT',

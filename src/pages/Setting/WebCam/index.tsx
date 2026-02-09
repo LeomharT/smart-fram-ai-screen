@@ -1,4 +1,8 @@
-import { getWebCamConfig, putWebcamConfig } from '@/api/setting.api';
+import {
+  getWebCamConfig,
+  putWebcamConfig,
+  rebootService,
+} from '@/api/setting.api';
 import Loader from '@/components/Loader';
 import { MUTATIONS } from '@/constant/mutations';
 import { QUERIES } from '@/constant/queries';
@@ -9,7 +13,7 @@ import { App, Button, Flex, Form, Input } from 'antd';
 import { useEffect } from 'react';
 
 export default function WebCam() {
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
 
   const [form] = Form.useForm();
 
@@ -22,7 +26,33 @@ export default function WebCam() {
     mutationKey: [MUTATIONS.SETTING.NETWORK_CONFIG.WEBCAM.PUT],
     mutationFn: putWebcamConfig,
     onSuccess() {
-      message.success('操作成功');
+      modal.confirm({
+        title: '提示',
+        content:
+          '您刚刚修改了摄像头配置, 是否要立即重启所有后台配置以使配置生效?',
+        okText: '重启服务',
+        cancelText: '稍后重启',
+        okButtonProps: { size: 'large' },
+        cancelButtonProps: { size: 'large' },
+        onOk: () => {
+          reboot.mutate();
+        },
+      });
+    },
+  });
+
+  const reboot = useMutation({
+    mutationKey: [MUTATIONS.SETTING.REBOOT],
+    mutationFn: rebootService,
+    onMutate() {
+      message.loading({
+        key: 'LOADING',
+        content: '服务重启中请稍后...',
+        duration: 999999,
+      });
+    },
+    onSuccess() {
+      message.success({ key: 'LOADING', content: '服务重启成功' });
     },
   });
 

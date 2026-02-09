@@ -25,6 +25,7 @@ export const APIS = {
     CONNECTOR: `${HOST}/${PREFIX}/aiot/northbound_connector/thingscloud`,
     OPEN_PLATFORM: `${HOST}/${PREFIX}/aiot/northbound_connector/nifc/openapi`,
     WEBCAM: `${HOST}/${PREFIX}/aiot/camera/system/config/rknn_ai.camera_rtsp`,
+    REBOOT: `${HOST}/${PREFIX}/background-service/control`,
   },
   ANALYSIS: {
     RESULT: `${HOST}/${PREFIX}/sensor/detection-analysis-result`,

@@ -3,6 +3,7 @@ import {
   getOpenPlatform,
   putConnectorConfig,
   putOpenPlatformConfig,
+  rebootService,
 } from '@/api/setting.api';
 import Loader from '@/components/Loader';
 import { MUTATIONS } from '@/constant/mutations';
@@ -11,13 +12,13 @@ import type { ConnectorConfig, OpenPlatformConfig } from '@/types/setting.type';
 import { CheckOutlined } from '@ant-design/icons';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import {
+  App,
   Button,
   Col,
   Flex,
   Form,
   Input,
   InputNumber,
-  message,
   Row,
   Space,
   Typography,
@@ -25,6 +26,8 @@ import {
 import { useEffect } from 'react';
 
 export default function NetworkConfig() {
+  const { message, modal } = App.useApp();
+
   const [connectorForm] = Form.useForm();
 
   const [openForm] = Form.useForm();
@@ -43,7 +46,18 @@ export default function NetworkConfig() {
     mutationKey: [MUTATIONS.SETTING.NETWORK_CONFIG.CONNECTOR.PUT],
     mutationFn: putConnectorConfig,
     onSuccess() {
-      message.success('操作成功');
+      modal.confirm({
+        title: '提示',
+        content:
+          '您刚刚修改了网络配置, 是否要立即重启所有后台配置以使配置生效?',
+        okText: '重启服务',
+        cancelText: '稍后重启',
+        okButtonProps: { size: 'large' },
+        cancelButtonProps: { size: 'large' },
+        onOk: () => {
+          reboot.mutate();
+        },
+      });
     },
   });
 
@@ -51,7 +65,33 @@ export default function NetworkConfig() {
     mutationKey: [MUTATIONS.SETTING.NETWORK_CONFIG.OPEN_PLATFORM.PUT],
     mutationFn: putOpenPlatformConfig,
     onSuccess() {
-      message.success('操作成功');
+      modal.confirm({
+        title: '提示',
+        content:
+          '您刚刚修改了网络配置, 是否要立即重启所有后台配置以使配置生效?',
+        okText: '重启服务',
+        cancelText: '稍后重启',
+        okButtonProps: { size: 'large' },
+        cancelButtonProps: { size: 'large' },
+        onOk: () => {
+          reboot.mutate();
+        },
+      });
+    },
+  });
+
+  const reboot = useMutation({
+    mutationKey: [MUTATIONS.SETTING.REBOOT],
+    mutationFn: rebootService,
+    onMutate() {
+      message.loading({
+        key: 'LOADING',
+        content: '服务重启中请稍后...',
+        duration: 999999,
+      });
+    },
+    onSuccess() {
+      message.success({ key: 'LOADING', content: '服务重启成功' });
     },
   });
 

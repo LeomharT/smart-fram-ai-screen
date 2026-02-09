@@ -1,4 +1,8 @@
-import { getLocalNetwork, postLocalNetwork } from '@/api/setting.api';
+import {
+  getLocalNetwork,
+  postLocalNetwork,
+  rebootService,
+} from '@/api/setting.api';
 import Loader from '@/components/Loader';
 import { MUTATIONS } from '@/constant/mutations';
 import { QUERIES } from '@/constant/queries';
@@ -9,7 +13,7 @@ import { App, Button, Flex, Form, Input, Radio } from 'antd';
 import { useEffect } from 'react';
 
 export default function LocalNetwork() {
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
 
   const [form] = Form.useForm();
 
@@ -22,7 +26,33 @@ export default function LocalNetwork() {
     mutationKey: [MUTATIONS.SETTING.LOCAL_NETWORK.POST],
     mutationFn: postLocalNetwork,
     onSuccess() {
-      message.success('提交成功');
+      modal.confirm({
+        title: '提示',
+        content:
+          '您刚刚修改了本地网络配置, 是否要立即重启所有后台配置以使配置生效?',
+        okText: '重启服务',
+        cancelText: '稍后重启',
+        okButtonProps: { size: 'large' },
+        cancelButtonProps: { size: 'large' },
+        onOk: () => {
+          reboot.mutate();
+        },
+      });
+    },
+  });
+
+  const reboot = useMutation({
+    mutationKey: [MUTATIONS.SETTING.REBOOT],
+    mutationFn: rebootService,
+    onMutate() {
+      message.loading({
+        key: 'LOADING',
+        content: '服务重启中请稍后...',
+        duration: 999999,
+      });
+    },
+    onSuccess() {
+      message.success({ key: 'LOADING', content: '服务重启成功' });
     },
   });
 

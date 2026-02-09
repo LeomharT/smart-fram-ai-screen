@@ -64,3 +64,10 @@ export async function putWebcamConfig(data: WebCamConfig) {
     method: 'PUT',
   });
 }
+
+export async function rebootService() {
+  return fetchData(APIS.SETTING.REBOOT, {
+    method: 'POST',
+    body: JSON.stringify({ serviceName: 'All', action: 'restart' }),
+  });
+}

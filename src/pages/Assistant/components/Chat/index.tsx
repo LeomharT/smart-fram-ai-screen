@@ -564,7 +564,10 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
           }}
           autoSize={{ minRows: 3, maxRows: 3 }}
           loading={isPending}
-          onSubmit={(message) => sendMessage(message)}
+          onSubmit={(message) => {
+            sendMessage(message);
+            senderRef.current?.blur();
+          }}
           onFocus={() => setFocuse(true)}
           onBlur={() => setFocuse(false)}
           onCancel={() => {

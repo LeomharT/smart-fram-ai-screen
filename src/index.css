@@ -1,0 +1,15 @@
+@import url('antd/dist/reset.css');
+@import url('nprogress/nprogress.css');
+
+@font-face {
+  font-family: 'Alimama_ShuHeiTi_Bold';
+  src: url('/assets/fonts/Alimama_ShuHeiTi_Bold.ttf') format('truetype');
+}
+
+html {
+  touch-action: manipulation;
+}
+
+#nprogress .bar {
+  background: #95de64;
+}

@@ -1,0 +1,79 @@
+import CurrTime from '@/components/CurrTime';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { Alert, App, ConfigProvider, Image, Space, theme } from 'antd';
+import zh_CN from 'antd/locale/zh_CN';
+import Nprogress from 'nprogress';
+import { Suspense, useEffect } from 'react';
+import { Outlet, useMatches } from 'react-router';
+import classes from './style.module.css';
+
+Nprogress.configure({
+  showSpinner: false,
+});
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
+export default function AppShell() {
+  const match = useMatches();
+
+  return (
+    <ConfigProvider
+      locale={zh_CN}
+      theme={{
+        algorithm: theme.defaultAlgorithm,
+        token: {
+          colorPrimary: '#00b96b',
+        },
+      }}
+    >
+      <App>
+        <QueryClientProvider client={queryClient}>
+          <ReactQueryDevtools />
+          <div className={classes.wrap}>
+            <div className={classes.content}>
+              <header className={classes.header}>
+                <Space size='large'>
+                  {match[match.length - 1]?.pathname === '/' && (
+                    <Image
+                      preview={false}
+                      width={60}
+                      src='/assets/imgs/logo.png'
+                    />
+                  )}
+                  <h1>{(match.at(-1)?.handle as { title?: string })?.title}</h1>
+                </Space>
+                <CurrTime />
+              </header>
+              <main className={classes.main}>
+                <Suspense fallback={<Fallback />}>
+                  <Alert.ErrorBoundary>
+                    <Outlet />
+                  </Alert.ErrorBoundary>
+                </Suspense>
+              </main>
+            </div>
+          </div>
+        </QueryClientProvider>
+      </App>
+    </ConfigProvider>
+  );
+}
+
+function Fallback() {
+  useEffect(() => {
+    Nprogress.start();
+
+    return () => {
+      Nprogress.done();
+    };
+  }, []);
+
+  return <></>;
+}

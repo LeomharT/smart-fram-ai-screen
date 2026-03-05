@@ -1,0 +1,19 @@
+.loader {
+  & :global(.ant-spin-container) {
+    height: 100%;
+  }
+}
+
+.list {
+  width: 220px;
+  height: 100%;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: space-between;
+}
+
+.item {
+  border: 1px solid #ffffff;
+  border-radius: 8px;
+  padding: 12px;
+}

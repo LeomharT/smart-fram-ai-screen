@@ -19,7 +19,7 @@ export const routes = createBrowserRouter(
       <Route
         index
         element={<Home />}
-        handle={{ title: '智莓安农' }}
+        handle={{ title: '果诊无忧' }}
       />
       <Route
         path='analysis'
@@ -30,7 +30,7 @@ export const routes = createBrowserRouter(
         <Route
           index
           element={<Assistant />}
-          handle={{ title: '农业大模型助手' }}
+          handle={{ title: '水果AI诊断与防治助手' }}
         />
         <Route
           path='report'

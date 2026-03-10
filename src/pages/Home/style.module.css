@@ -26,12 +26,12 @@
   height: fit-content;
   display: flex;
   flex-flow: row nowrap;
-  justify-content: center;
+  justify-content: space-between;
   margin-bottom: -48px;
   row-gap: 48px;
   position: absolute;
   bottom: 250px;
-  gap: 64px;
+  gap: 16px;
 }
 
 .item {
@@ -56,4 +56,12 @@
     color: white !important;
     background: transparent !important;
   }
+}
+
+.algorithm {
+  position: absolute;
+  width: 75%;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 90px;
 }

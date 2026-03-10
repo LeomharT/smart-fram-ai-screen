@@ -119,7 +119,7 @@ export default function Analysis() {
                 )}
               />
               <AnalysisResultContent
-                label='检测结果'
+                label='诊断结果'
                 content={selected?.detectedLabels}
               />
             </Space>

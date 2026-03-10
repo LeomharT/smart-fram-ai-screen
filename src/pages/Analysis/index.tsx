@@ -127,22 +127,20 @@ export default function Analysis() {
               (v, i) => (
                 <Fragment key={i}>
                   <AnalysisResultContent
-                    label={v}
-                    content={`
-                    描述: ${selected?.labelsDescriptionAndMeasures[v].description}
-                     `}
+                    label='描述'
+                    content={
+                      selected?.labelsDescriptionAndMeasures[v].description
+                    }
                   />
                   <AnalysisResultContent
-                    label={v}
-                    content={`
-                    措施: ${selected?.labelsDescriptionAndMeasures[v].measure}
-                     `}
+                    label={'防治策略'}
+                    content={selected?.labelsDescriptionAndMeasures[v].measure}
                   />
                 </Fragment>
               ),
             )}
             <AnalysisResultContent
-              label='检测结果'
+              label='诊断结果'
               content={<Pie width={350} height={250} {...config} />}
             />
           </Flex>

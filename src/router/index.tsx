@@ -19,7 +19,7 @@ export const routes = createBrowserRouter(
       <Route
         index
         element={<Home />}
-        handle={{ title: '智慧农业AI边缘网关' }}
+        handle={{ title: '智莓安农' }}
       />
       <Route
         path='analysis'

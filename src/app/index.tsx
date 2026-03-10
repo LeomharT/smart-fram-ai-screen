@@ -43,7 +43,7 @@ export default function AppShell() {
                   {match[match.length - 1]?.pathname === '/' && (
                     <Image
                       preview={false}
-                      width={60}
+                      width={80}
                       src='/assets/imgs/logo.png'
                     />
                   )}

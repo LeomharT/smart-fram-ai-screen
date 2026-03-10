@@ -1,7 +1,7 @@
 const _MODE = import.meta.env.MODE as 'development' | 'production';
 
 const _HOSTS = {
-  development: 'http://192.168.68.60:80',
+  development: 'http://192.168.14.4',
   production: 'http://127.0.0.1:80',
 };
 

@@ -26,12 +26,12 @@
   height: fit-content;
   display: flex;
   flex-flow: row nowrap;
-  justify-content: space-between;
+  justify-content: center;
   margin-bottom: -48px;
   row-gap: 48px;
   position: absolute;
   bottom: 250px;
-  gap: 16px;
+  gap: 64px;
 }
 
 .item {

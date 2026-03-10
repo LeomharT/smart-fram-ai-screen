@@ -3,7 +3,6 @@ import classes from './style.module.css';
 import navi_1 from '/assets/imgs/navi_1.png?url';
 import navi_2 from '/assets/imgs/navi_2.png?url';
 import navi_3 from '/assets/imgs/navi_3.png?url';
-import navi_4 from '/assets/imgs/navi_4.png?url';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -23,11 +22,6 @@ export default function Home() {
       url: '/linkedApp',
       src: navi_3,
       label: '联动应用',
-    },
-    {
-      url: '/setting',
-      src: navi_4,
-      label: '服务配置',
     },
   ];
 

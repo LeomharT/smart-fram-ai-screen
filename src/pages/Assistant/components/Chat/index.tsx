@@ -497,7 +497,7 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
           onClick={() => reportMutation.mutate()}
           icon={<InboxOutlined />}
         >
-          一键生成农事报告
+          一键生成报告
         </Button>
         <Button
           block

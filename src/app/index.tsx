@@ -37,7 +37,10 @@ export default function AppShell() {
         <QueryClientProvider client={queryClient}>
           <ReactQueryDevtools />
           <div className={classes.wrap}>
-            <div className={classes.content}>
+            <div
+              className={classes.content}
+              data-route={match.at(-1)?.pathname}
+            >
               <header className={classes.header}>
                 <Space size='large'>
                   {match[match.length - 1]?.pathname === '/' && (

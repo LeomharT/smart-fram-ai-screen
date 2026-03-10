@@ -15,6 +15,15 @@
   background-size: cover;
   background-repeat: no-repeat;
 }
+.content[data-route='/analysis'] {
+  background-image: url('/assets/imgs/bg1.png');
+}
+.content[data-route='/assistant/'] {
+  background-image: url('/assets/imgs/bg2.png');
+}
+.content[data-route='/linkedApp'] {
+  background-image: url('/assets/imgs/bg3.png');
+}
 
 .header {
   height: 100px;

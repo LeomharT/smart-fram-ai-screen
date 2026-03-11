@@ -1,0 +1,49 @@
+import NotFound from '@/pages/NotFound';
+import { lazy } from 'react';
+import {
+  createBrowserRouter,
+  createRoutesFromElements,
+  Route,
+} from 'react-router';
+import AppShell from '../app';
+
+const Home = lazy(() => import('@/pages/Home/index'));
+const Analysis = lazy(() => import('@/pages/Analysis/index'));
+const Assistant = lazy(() => import('@/pages/Assistant/index'));
+const Report = lazy(() => import('@/pages/Assistant/components/Report/index'));
+const LinkedApp = lazy(() => import('@/pages/LinkedApp/index'));
+
+export const routes = createBrowserRouter(
+  createRoutesFromElements(
+    <Route path='/' element={<AppShell />}>
+      <Route
+        index
+        element={<Home />}
+        handle={{ title: '果诊无忧' }}
+      />
+      <Route
+        path='analysis'
+        element={<Analysis />}
+        handle={{ title: 'AI智能识别' }}
+      />
+      <Route path='assistant'>
+        <Route
+          index
+          element={<Assistant />}
+          handle={{ title: '水果AI诊断与防治助手' }}
+        />
+        <Route
+          path='report'
+          element={<Report />}
+          handle={{ title: '农事报告' }}
+        />
+      </Route>
+      <Route
+        path='linkedApp'
+        element={<LinkedApp />}
+        handle={{ title: '联动应用' }}
+      />
+      <Route path='*' element={<NotFound />} />
+    </Route>,
+  ),
+);

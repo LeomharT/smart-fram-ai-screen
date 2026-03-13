@@ -39,6 +39,7 @@ import {
 import MPEGMode from 'lamejs/src/js/MPEGMode';
 import { useEffect, useRef, useState } from 'react';
 import { genItem } from '../../genItem';
+import { ANSWERS, KEYWORDS } from '../../module';
 import classes from './style.module.css';
 import ai from '/assets/imgs/icons/ai.svg?url';
 
@@ -265,6 +266,45 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
         genItem(false, message, { typing: false, key: items.length }),
       ];
     });
+
+    senderRef.current?.clear();
+    listRef.current?.scrollTo({ top: 'bottom', behavior: 'instant' });
+
+    function matchQuestion(question: string) {
+      let bestKey: string | null = null;
+      let bestScore = 0;
+
+      for (const [key, text] of Object.entries(KEYWORDS)) {
+        let score = 0;
+
+        if (question.includes(text)) {
+          score += 100;
+        }
+
+        for (let i = 0; i < text.length; i++) {
+          for (let len = 2; len <= text.length; len++) {
+            const part = text.slice(i, i + len);
+            if (part && question.includes(part)) {
+              score += len;
+            }
+          }
+        }
+
+        if (score > bestScore) {
+          bestScore = score;
+          bestKey = key;
+        }
+      }
+
+      return bestKey;
+    }
+
+    const matchKey = matchQuestion(message) as keyof typeof ANSWERS | undefined;
+    const answer = matchKey ? ANSWERS[matchKey] : null;
+
+    console.log(matchKey, answer);
+
+    return;
 
     resetAudioEngine();
 

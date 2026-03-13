@@ -38,8 +38,9 @@ export async function spechToText(audio: File) {
 }
 
 export async function getTips() {
-  const res = await fetchData<string>(APIS.ASSISTANT.TIPS);
-  return res?.data;
+  // const res = await fetchData<string>(APIS.ASSISTANT.TIPS);
+  // return res?.data;
+  return '苹果果实较小;当前生长情况;当前苹果生长气候环境;病害治理情况;完整报告';
 }
 
 export async function putTip(data: { tip: string }) {

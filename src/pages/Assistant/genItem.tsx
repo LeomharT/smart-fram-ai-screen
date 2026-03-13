@@ -1,18 +1,4 @@
-import type {
-  BubbleItemType,
-  BubbleListProps,
-  BubbleProps,
-} from '@ant-design/x';
-import XMarkdown from '@ant-design/x-markdown';
-import { Typography } from 'antd';
-
-const renderMarkdown: BubbleProps['contentRender'] = (content) => {
-  return (
-    <Typography>
-      <XMarkdown content={content} />
-    </Typography>
-  );
-};
+import type { BubbleItemType, BubbleListProps } from '@ant-design/x';
 
 export const genItem = (
   isAI: boolean,
@@ -26,14 +12,9 @@ export const genItem = (
     styles: {
       content: {
         background: isAI ? '#ffffff' : '#00b96b',
+        color: isAI ? '#000000' : '#ffffff',
       },
     },
-    contentRender: (...args) =>
-      isAI ? (
-        renderMarkdown(...args)
-      ) : (
-        <Typography style={{ color: '#fff' }}>{content}</Typography>
-      ),
     ...config,
   } as BubbleListProps['items'][number] & {
     audioChunks: string[];

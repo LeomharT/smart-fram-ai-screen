@@ -39,7 +39,7 @@ import {
 import MPEGMode from 'lamejs/src/js/MPEGMode';
 import { useEffect, useRef, useState } from 'react';
 import { genItem } from '../../genItem';
-import { ANSWERS, KEYWORDS } from '../../module';
+import { ANSWERS, AUDIO, KEYWORDS } from '../../module';
 import classes from './style.module.css';
 import ai from '/assets/imgs/icons/ai.svg?url';
 
@@ -302,7 +302,27 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
     const matchKey = matchQuestion(message) as keyof typeof ANSWERS | undefined;
     const answer = matchKey ? ANSWERS[matchKey] : null;
 
-    console.log(matchKey, answer);
+    if (answer) {
+      setItems((prev) => {
+        return [
+          ...prev,
+          genItem(true, answer, {
+            key: items.length + 1,
+            typing: { effect: 'fade-in', step: 3 },
+          }),
+        ];
+      });
+
+      audioRef.current?.pause();
+      audioRef.current = null;
+
+      if (!audioRef.current) audioRef.current = new Audio();
+
+      audioRef.current.src = AUDIO[matchKey!];
+      audioRef.current.play().catch((e) => {
+        console.error(e);
+      });
+    }
 
     return;
 
@@ -598,10 +618,7 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
             suffix: classes.suffix,
             input: classes.input,
           }}
-          allowSpeech={{
-            onRecordingChange: handleOnRecord,
-            recording: recording || sttMutation.isPending,
-          }}
+          allowSpeech={false}
           autoSize={{ minRows: 3, maxRows: 3 }}
           loading={isPending}
           onSubmit={(message) => {

@@ -18,3 +18,11 @@ export const ANSWERS = {
   FULL_REPORT:
     '苹果果实属于仁果，由花托和子房共同发育而成（假果）。我们食用的主要部分是肉质化的花托，核心部位才是真正的子房（果心）。外部结构：果柄、梗洼、萼洼、果皮（角质层、蜡质层）。内部结构：果肉（花托发育）、果心线、果心（5个心皮）、种子。苹果果实的生长呈S型曲线，可分为三个关键阶段：第一阶段：授粉受精与细胞分裂期，第二阶段：细胞膨大期，第三阶段：成熟着色期。果个大小某产区目标单果重通常为200-300g。苹果果实是一个复杂的生命体，优质果实的形成需要贯穿全年的精细化管理：春季保花保果定数量，夏季膨大补钾长个头，秋季增色控氮提品质，采后及时补养备来年。',
 } as const;
+
+export const AUDIO = {
+  SMALL_FRUIT: '/assets/audio/SMALL_FRUIT.mp3',
+  CURRENT_GROWTH_STATUS: '/assets/audio/CURRENT_GROWTH_STATUS.mp3',
+  CLIMATE_ENVIRONMENT: '/assets/audio/CLIMATE_ENVIRONMENT.mp3',
+  DISEASE_MANAGEMENT: '/assets/audio/DISEASE_MANAGEMENT.mp3',
+  FULL_REPORT: '/assets/audio/FULL_REPORT.mp3',
+} as const;

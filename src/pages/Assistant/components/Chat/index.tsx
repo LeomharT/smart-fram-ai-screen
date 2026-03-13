@@ -71,7 +71,7 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
 
   const [isPending, setPending] = useState(false);
 
-  const [recording, setRecording] = useState(false);
+  const [, setRecording] = useState(false);
 
   const eventSourceRef = useRef<EventSource>(null);
 
@@ -334,21 +334,6 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
         setPlaying(false);
       };
     }
-
-    return;
-
-    resetAudioEngine();
-
-    senderRef.current?.clear();
-    listRef.current?.scrollTo({ top: 'bottom', behavior: 'instant' });
-
-    audioRef.current?.pause();
-    audioRef.current = null;
-
-    if (!audioRef.current) audioRef.current = new Audio();
-    audioRef.current.play().catch(() => {});
-
-    openConnect(message);
   }
 
   function updateLastAIChatContent(content: string) {
@@ -528,6 +513,7 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
   };
 
   useEffect(() => {
+    console.log(handleOnRecord, openConnect);
     return () => {
       audioRef.current?.pause();
       cancelMutation();

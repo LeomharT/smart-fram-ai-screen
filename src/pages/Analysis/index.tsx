@@ -8,7 +8,8 @@ import { Pie, type PieConfig } from '@ant-design/charts';
 import { ReloadOutlined } from '@ant-design/icons';
 import { useQueries } from '@tanstack/react-query';
 import { Button, Flex, Image, Space, Typography } from 'antd';
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
+import { RESULT } from './data';
 import classes from './style.module.css';
 
 const formater = new Intl.DateTimeFormat('zh-CN', {
@@ -33,6 +34,10 @@ export default function Analysis() {
 
   const [history, setHistory] = useState<AnalysisResult[]>([]);
 
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  const [isPlaying, setPlaying] = useState(false);
+
   const config: PieConfig = {
     forceFit: true,
     radius: 0.8,
@@ -53,12 +58,37 @@ export default function Analysis() {
     },
   };
 
+  function playAudio(key?: string) {
+    audioRef.current?.pause();
+    audioRef.current = null;
+
+    if (!audioRef.current) {
+      audioRef.current = new Audio(RESULT[key as keyof typeof RESULT]);
+
+      audioRef.current.play();
+
+      audioRef.current.onplaying = () => {
+        setPlaying(true);
+      };
+      audioRef.current.onended = () => {
+        setPlaying(false);
+      };
+    }
+  }
+
+  function stopAudio() {
+    audioRef.current?.pause();
+    audioRef.current = null;
+    setPlaying(false);
+  }
+
   useEffect(() => {
     if (!result.isFetching) {
       if (result.data) {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setHistory((prev) => [result.data!, ...prev]);
         setSelected(result.data);
+        playAudio(result.data.detectedLabels?.[0] ?? '卷叶蛾');
       }
     }
   }, [result.data, result.isFetching]);
@@ -108,6 +138,17 @@ export default function Analysis() {
               onClick={() => result.refetch()}
             >
               拍照识别
+            </Button>
+            <Button
+              size='large'
+              loading={result.isFetching}
+              onClick={() =>
+                isPlaying
+                  ? stopAudio()
+                  : playAudio(selected?.detectedLabels?.[0])
+              }
+            >
+              {isPlaying ? '停止播放' : '开始播放'}
             </Button>
           </Flex>
           <Flex className={classes.report}>

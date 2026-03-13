@@ -5,7 +5,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import Chat from './components/Chat';
 import Report from './components/Report';
-import Sensors from './components/Sensors';
 import { genItem } from './genItem';
 import classes from './style.module.css';
 
@@ -15,7 +14,7 @@ export default function Assistant() {
   const [items, setItems] = useState<BubbleItemType[]>([
     genItem(
       true,
-      '您好, 我是新大陆农业大模型AI助手, 可以帮您解答农业问题, 分析作物状况并生成农事报告',
+      '您好, 我是农业大模型AI助手, 可以帮您解答农业问题, 分析作物状况并生成农事报告',
       { typing: false, key: 'init' },
     ),
   ]);
@@ -41,8 +40,7 @@ export default function Assistant() {
               setItems={setItems}
               onCheckReport={() => setActive('report')}
             />
-            <Sensors />
-          </div>
+           </div>
         ) : (
           <Report />
         )}

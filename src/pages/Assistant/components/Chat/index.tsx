@@ -108,6 +108,7 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
               icon={<MutedOutlined />}
               onClick={async () => {
                 resetAudioEngine();
+                setPending(false);
                 setPlaying(false);
                 if (audioRef.current) audioRef.current.volume = 0;
               }}
@@ -133,23 +134,23 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
                 disabled={isPending}
                 hidden={isPlaying && key === items.length - 1}
                 onClick={() => {
-                  const chunk = audioHistory.current[key.toString()];
-                  const byteArrays = chunk.map(
-                    (base64) => new Uint8Array(base64ToArrayBuffer(base64)),
-                  );
-                  const combinedBlob = new Blob(byteArrays, {
-                    type: 'audio/mp3',
+                  const matchKey = matchQuestion(_, ANSWERS) as
+                    | keyof typeof ANSWERS
+                    | undefined;
+                  audioRef.current?.pause();
+                  audioRef.current = null;
+
+                  if (!audioRef.current) audioRef.current = new Audio();
+
+                  audioRef.current.src = AUDIO[matchKey!];
+                  audioRef.current.play().catch((e) => {
+                    console.error(e);
                   });
-
-                  const url = URL.createObjectURL(combinedBlob);
-                  resetAudioEngine();
-                  audioRef.current = new Audio(url);
-                  audioRef.current.play();
-                  setPlayingKey(key);
-
+                  audioRef.current.onplaying = () => {
+                    setPlaying(true);
+                  };
                   audioRef.current.onended = () => {
-                    URL.revokeObjectURL(url);
-                    setPlayingKey(0);
+                    setPlaying(false);
                   };
                 }}
               />
@@ -259,6 +260,35 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
     },
   });
 
+  function matchQuestion(question: string, obj: Record<string, string>) {
+    let bestKey: string | null = null;
+    let bestScore = 0;
+
+    for (const [key, text] of Object.entries(obj)) {
+      let score = 0;
+
+      if (question.includes(text)) {
+        score += 100;
+      }
+
+      for (let i = 0; i < text.length; i++) {
+        for (let len = 2; len <= text.length; len++) {
+          const part = text.slice(i, i + len);
+          if (part && question.includes(part)) {
+            score += len;
+          }
+        }
+      }
+
+      if (score > bestScore) {
+        bestScore = score;
+        bestKey = key;
+      }
+    }
+
+    return bestKey;
+  }
+
   function sendMessage(message: string) {
     setItems((prev) => {
       return [
@@ -270,36 +300,9 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
     senderRef.current?.clear();
     listRef.current?.scrollTo({ top: 'bottom', behavior: 'instant' });
 
-    function matchQuestion(question: string) {
-      let bestKey: string | null = null;
-      let bestScore = 0;
-
-      for (const [key, text] of Object.entries(KEYWORDS)) {
-        let score = 0;
-
-        if (question.includes(text)) {
-          score += 100;
-        }
-
-        for (let i = 0; i < text.length; i++) {
-          for (let len = 2; len <= text.length; len++) {
-            const part = text.slice(i, i + len);
-            if (part && question.includes(part)) {
-              score += len;
-            }
-          }
-        }
-
-        if (score > bestScore) {
-          bestScore = score;
-          bestKey = key;
-        }
-      }
-
-      return bestKey;
-    }
-
-    const matchKey = matchQuestion(message) as keyof typeof ANSWERS | undefined;
+    const matchKey = matchQuestion(message, KEYWORDS) as
+      | keyof typeof ANSWERS
+      | undefined;
     const answer = matchKey ? ANSWERS[matchKey] : null;
 
     if (answer) {
@@ -308,7 +311,7 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
           ...prev,
           genItem(true, answer, {
             key: items.length + 1,
-            typing: { effect: 'fade-in', step: 3 },
+            typing: { effect: 'fade-in', step: 10 },
           }),
         ];
       });
@@ -322,6 +325,14 @@ export default function Chat({ items, setItems, onCheckReport }: ChatProps) {
       audioRef.current.play().catch((e) => {
         console.error(e);
       });
+      audioRef.current.onplaying = () => {
+        setPending(true);
+        setPlaying(true);
+      };
+      audioRef.current.onended = () => {
+        setPending(false);
+        setPlaying(false);
+      };
     }
 
     return;
